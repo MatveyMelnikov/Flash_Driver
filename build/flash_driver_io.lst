@@ -1,0 +1,229 @@
+ARM GAS  /tmp/cc1NaGtC.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"flash_driver_io.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "External/flash_driver/Src/flash_driver_io.c"
+  18              		.section	.text.flash_driver_io_write,"ax",%progbits
+  19              		.align	1
+  20              		.global	flash_driver_io_write
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	flash_driver_io_write:
+  26              	.LVL0:
+  27              	.LFB65:
+   1:External/flash_driver/Src/flash_driver_io.c **** #include "flash_driver_io.h"
+   2:External/flash_driver/Src/flash_driver_io.c **** #include "stm32f1xx.h"
+   3:External/flash_driver/Src/flash_driver_io.c **** #include "stm32f1xx_hal_spi.h"
+   4:External/flash_driver/Src/flash_driver_io.c **** #include "stm32f1xx_hal_gpio.h"
+   5:External/flash_driver/Src/flash_driver_io.c **** 
+   6:External/flash_driver/Src/flash_driver_io.c **** extern SPI_HandleTypeDef *flash_driver_spi;
+   7:External/flash_driver/Src/flash_driver_io.c **** 
+   8:External/flash_driver/Src/flash_driver_io.c **** // Implementations -----------------------------------------------------------
+   9:External/flash_driver/Src/flash_driver_io.c **** 
+  10:External/flash_driver/Src/flash_driver_io.c **** flash_driver_status flash_driver_io_write(
+  11:External/flash_driver/Src/flash_driver_io.c ****   uint8_t *const output_data,
+  12:External/flash_driver/Src/flash_driver_io.c ****   const uint8_t output_data_size
+  13:External/flash_driver/Src/flash_driver_io.c **** )
+  14:External/flash_driver/Src/flash_driver_io.c **** {
+  28              		.loc 1 14 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		.loc 1 14 1 is_stmt 0 view .LVU1
+  33 0000 08B5     		push	{r3, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 3, -8
+  37              		.cfi_offset 14, -4
+  38 0002 0A46     		mov	r2, r1
+  15:External/flash_driver/Src/flash_driver_io.c ****   return (flash_driver_status)HAL_SPI_Transmit(
+  39              		.loc 1 15 3 is_stmt 1 view .LVU2
+  40              		.loc 1 15 31 is_stmt 0 view .LVU3
+  41 0004 1023     		movs	r3, #16
+  42 0006 0146     		mov	r1, r0
+  43              	.LVL1:
+ARM GAS  /tmp/cc1NaGtC.s 			page 2
+
+
+  44              		.loc 1 15 31 view .LVU4
+  45 0008 0248     		ldr	r0, .L3
+  46              	.LVL2:
+  47              		.loc 1 15 31 view .LVU5
+  48 000a 0068     		ldr	r0, [r0]
+  49 000c FFF7FEFF 		bl	HAL_SPI_Transmit
+  50              	.LVL3:
+  16:External/flash_driver/Src/flash_driver_io.c ****     flash_driver_spi,
+  17:External/flash_driver/Src/flash_driver_io.c ****     output_data,
+  18:External/flash_driver/Src/flash_driver_io.c ****     output_data_size,
+  19:External/flash_driver/Src/flash_driver_io.c ****     FLASH_DRIVER_TIMEOUT
+  20:External/flash_driver/Src/flash_driver_io.c ****   );
+  21:External/flash_driver/Src/flash_driver_io.c **** }
+  51              		.loc 1 21 1 view .LVU6
+  52 0010 08BD     		pop	{r3, pc}
+  53              	.L4:
+  54 0012 00BF     		.align	2
+  55              	.L3:
+  56 0014 00000000 		.word	flash_driver_spi
+  57              		.cfi_endproc
+  58              	.LFE65:
+  60              		.section	.text.flash_driver_io_write_read,"ax",%progbits
+  61              		.align	1
+  62              		.global	flash_driver_io_write_read
+  63              		.syntax unified
+  64              		.thumb
+  65              		.thumb_func
+  67              	flash_driver_io_write_read:
+  68              	.LVL4:
+  69              	.LFB66:
+  22:External/flash_driver/Src/flash_driver_io.c **** 
+  23:External/flash_driver/Src/flash_driver_io.c **** flash_driver_status flash_driver_io_write_read(
+  24:External/flash_driver/Src/flash_driver_io.c ****   uint8_t *const output_data,
+  25:External/flash_driver/Src/flash_driver_io.c ****   uint8_t *const input_data,
+  26:External/flash_driver/Src/flash_driver_io.c ****   const uint8_t output_data_size
+  27:External/flash_driver/Src/flash_driver_io.c **** )
+  28:External/flash_driver/Src/flash_driver_io.c **** {
+  70              		.loc 1 28 1 is_stmt 1 view -0
+  71              		.cfi_startproc
+  72              		@ args = 0, pretend = 0, frame = 0
+  73              		@ frame_needed = 0, uses_anonymous_args = 0
+  74              		.loc 1 28 1 is_stmt 0 view .LVU8
+  75 0000 00B5     		push	{lr}
+  76              	.LCFI1:
+  77              		.cfi_def_cfa_offset 4
+  78              		.cfi_offset 14, -4
+  79 0002 83B0     		sub	sp, sp, #12
+  80              	.LCFI2:
+  81              		.cfi_def_cfa_offset 16
+  82 0004 1346     		mov	r3, r2
+  29:External/flash_driver/Src/flash_driver_io.c ****   return (flash_driver_status)HAL_SPI_TransmitReceive(
+  83              		.loc 1 29 3 is_stmt 1 view .LVU9
+  84              		.loc 1 29 31 is_stmt 0 view .LVU10
+  85 0006 1022     		movs	r2, #16
+  86              	.LVL5:
+  87              		.loc 1 29 31 view .LVU11
+  88 0008 0092     		str	r2, [sp]
+ARM GAS  /tmp/cc1NaGtC.s 			page 3
+
+
+  89 000a 0A46     		mov	r2, r1
+  90 000c 0146     		mov	r1, r0
+  91              	.LVL6:
+  92              		.loc 1 29 31 view .LVU12
+  93 000e 0348     		ldr	r0, .L7
+  94              	.LVL7:
+  95              		.loc 1 29 31 view .LVU13
+  96 0010 0068     		ldr	r0, [r0]
+  97 0012 FFF7FEFF 		bl	HAL_SPI_TransmitReceive
+  98              	.LVL8:
+  30:External/flash_driver/Src/flash_driver_io.c ****     flash_driver_spi,
+  31:External/flash_driver/Src/flash_driver_io.c ****     output_data,
+  32:External/flash_driver/Src/flash_driver_io.c ****     input_data,
+  33:External/flash_driver/Src/flash_driver_io.c ****     output_data_size,
+  34:External/flash_driver/Src/flash_driver_io.c ****     FLASH_DRIVER_TIMEOUT
+  35:External/flash_driver/Src/flash_driver_io.c ****   );
+  36:External/flash_driver/Src/flash_driver_io.c **** }
+  99              		.loc 1 36 1 view .LVU14
+ 100 0016 03B0     		add	sp, sp, #12
+ 101              	.LCFI3:
+ 102              		.cfi_def_cfa_offset 4
+ 103              		@ sp needed
+ 104 0018 5DF804FB 		ldr	pc, [sp], #4
+ 105              	.L8:
+ 106              		.align	2
+ 107              	.L7:
+ 108 001c 00000000 		.word	flash_driver_spi
+ 109              		.cfi_endproc
+ 110              	.LFE66:
+ 112              		.section	.text.flash_driver_select,"ax",%progbits
+ 113              		.align	1
+ 114              		.global	flash_driver_select
+ 115              		.syntax unified
+ 116              		.thumb
+ 117              		.thumb_func
+ 119              	flash_driver_select:
+ 120              	.LVL9:
+ 121              	.LFB67:
+  37:External/flash_driver/Src/flash_driver_io.c **** 
+  38:External/flash_driver/Src/flash_driver_io.c **** void flash_driver_select(bool select)
+  39:External/flash_driver/Src/flash_driver_io.c **** {
+ 122              		.loc 1 39 1 is_stmt 1 view -0
+ 123              		.cfi_startproc
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126              		.loc 1 39 1 is_stmt 0 view .LVU16
+ 127 0000 08B5     		push	{r3, lr}
+ 128              	.LCFI4:
+ 129              		.cfi_def_cfa_offset 8
+ 130              		.cfi_offset 3, -8
+ 131              		.cfi_offset 14, -4
+  40:External/flash_driver/Src/flash_driver_io.c ****   HAL_GPIO_WritePin(
+ 132              		.loc 1 40 3 is_stmt 1 view .LVU17
+ 133 0002 80F00102 		eor	r2, r0, #1
+ 134 0006 0121     		movs	r1, #1
+ 135 0008 0148     		ldr	r0, .L11
+ 136              	.LVL10:
+ARM GAS  /tmp/cc1NaGtC.s 			page 4
+
+
+ 137              		.loc 1 40 3 is_stmt 0 view .LVU18
+ 138 000a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 139              	.LVL11:
+  41:External/flash_driver/Src/flash_driver_io.c ****     GPIOB,
+  42:External/flash_driver/Src/flash_driver_io.c ****     GPIO_PIN_0,
+  43:External/flash_driver/Src/flash_driver_io.c ****     select ? GPIO_PIN_RESET : GPIO_PIN_SET
+  44:External/flash_driver/Src/flash_driver_io.c ****   );
+  45:External/flash_driver/Src/flash_driver_io.c **** }
+ 140              		.loc 1 45 1 view .LVU19
+ 141 000e 08BD     		pop	{r3, pc}
+ 142              	.L12:
+ 143              		.align	2
+ 144              	.L11:
+ 145 0010 000C0140 		.word	1073810432
+ 146              		.cfi_endproc
+ 147              	.LFE67:
+ 149              		.text
+ 150              	.Letext0:
+ 151              		.file 2 "External/flash_driver/Inc/flash_driver_defs.h"
+ 152              		.file 3 "/usr/local/src/arm-gnu-toolchain-13.2/arm-none-eabi/include/machine/_default_types.h"
+ 153              		.file 4 "/usr/local/src/arm-gnu-toolchain-13.2/arm-none-eabi/include/sys/_stdint.h"
+ 154              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 155              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 156              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 157              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 158              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h"
+ARM GAS  /tmp/cc1NaGtC.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 flash_driver_io.c
+     /tmp/cc1NaGtC.s:19     .text.flash_driver_io_write:00000000 $t
+     /tmp/cc1NaGtC.s:25     .text.flash_driver_io_write:00000000 flash_driver_io_write
+     /tmp/cc1NaGtC.s:56     .text.flash_driver_io_write:00000014 $d
+     /tmp/cc1NaGtC.s:61     .text.flash_driver_io_write_read:00000000 $t
+     /tmp/cc1NaGtC.s:67     .text.flash_driver_io_write_read:00000000 flash_driver_io_write_read
+     /tmp/cc1NaGtC.s:108    .text.flash_driver_io_write_read:0000001c $d
+     /tmp/cc1NaGtC.s:113    .text.flash_driver_select:00000000 $t
+     /tmp/cc1NaGtC.s:119    .text.flash_driver_select:00000000 flash_driver_select
+     /tmp/cc1NaGtC.s:145    .text.flash_driver_select:00000010 $d
+
+UNDEFINED SYMBOLS
+HAL_SPI_Transmit
+flash_driver_spi
+HAL_SPI_TransmitReceive
+HAL_GPIO_WritePin

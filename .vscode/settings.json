@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "flash_driver_defs.h": "c",
+    "flash_driver_io.h": "c"
+  },
+  "cortex-debug.variableUseNaturalFormat": false
+}

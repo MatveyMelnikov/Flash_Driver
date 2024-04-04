@@ -1,0 +1,974 @@
+ARM GAS  /tmp/cce4S0sR.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"flash_driver.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "External/flash_driver/Src/flash_driver.c"
+  18              		.section	.text.flash_driver_is_busy,"ax",%progbits
+  19              		.align	1
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	flash_driver_is_busy:
+  25              	.LFB2:
+   1:External/flash_driver/Src/flash_driver.c **** #include "flash_driver.h"
+   2:External/flash_driver/Src/flash_driver.c **** #include "flash_driver_io.h"
+   3:External/flash_driver/Src/flash_driver.c **** #include <memory.h>
+   4:External/flash_driver/Src/flash_driver.c **** #include <stdlib.h>
+   5:External/flash_driver/Src/flash_driver.c **** 
+   6:External/flash_driver/Src/flash_driver.c **** // Defines -------------------------------------------------------------------
+   7:External/flash_driver/Src/flash_driver.c **** 
+   8:External/flash_driver/Src/flash_driver.c **** // 24 bits
+   9:External/flash_driver/Src/flash_driver.c **** 
+  10:External/flash_driver/Src/flash_driver.c **** // Static functions ----------------------------------------------------------
+  11:External/flash_driver/Src/flash_driver.c **** 
+  12:External/flash_driver/Src/flash_driver.c **** __attribute__((always_inline))
+  13:External/flash_driver/Src/flash_driver.c **** inline static uint32_t flash_driver_reverse_addr(const uint32_t address)
+  14:External/flash_driver/Src/flash_driver.c **** {
+  15:External/flash_driver/Src/flash_driver.c ****   uint32_t result = address << 16;
+  16:External/flash_driver/Src/flash_driver.c ****   result |= address & 0xff00;
+  17:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+  18:External/flash_driver/Src/flash_driver.c **** 
+  19:External/flash_driver/Src/flash_driver.c ****   return result;
+  20:External/flash_driver/Src/flash_driver.c **** }
+  21:External/flash_driver/Src/flash_driver.c **** 
+  22:External/flash_driver/Src/flash_driver.c **** // The Write Enable instruction sets the Write Enable Latch bit
+  23:External/flash_driver/Src/flash_driver.c **** // The WEL bit must be set prior to every Program and Erase command.
+  24:External/flash_driver/Src/flash_driver.c **** // Winbond W25Q128JV datasheet (pg. 24)
+  25:External/flash_driver/Src/flash_driver.c **** static flash_driver_status flash_driver_write_enable()
+  26:External/flash_driver/Src/flash_driver.c **** {
+  27:External/flash_driver/Src/flash_driver.c ****   uint8_t output_data = FLASH_DRIVER_WRITE_ENABLE_CMD;
+  28:External/flash_driver/Src/flash_driver.c **** 
+  29:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(true);
+  30:External/flash_driver/Src/flash_driver.c ****   flash_driver_status status = flash_driver_io_write(
+  31:External/flash_driver/Src/flash_driver.c ****     &output_data, sizeof(uint8_t)
+  32:External/flash_driver/Src/flash_driver.c ****   );
+  33:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(false);
+ARM GAS  /tmp/cce4S0sR.s 			page 2
+
+
+  34:External/flash_driver/Src/flash_driver.c **** 
+  35:External/flash_driver/Src/flash_driver.c ****   return status;
+  36:External/flash_driver/Src/flash_driver.c **** }
+  37:External/flash_driver/Src/flash_driver.c **** 
+  38:External/flash_driver/Src/flash_driver.c **** static flash_driver_status flash_driver_is_busy()
+  39:External/flash_driver/Src/flash_driver.c **** {
+  26              		.loc 1 39 1 view -0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 8
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30 0000 10B5     		push	{r4, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 8
+  33              		.cfi_offset 4, -8
+  34              		.cfi_offset 14, -4
+  35 0002 82B0     		sub	sp, sp, #8
+  36              	.LCFI1:
+  37              		.cfi_def_cfa_offset 16
+  40:External/flash_driver/Src/flash_driver.c ****   uint8_t output_data[2] = {
+  38              		.loc 1 40 3 view .LVU1
+  39              		.loc 1 40 11 is_stmt 0 view .LVU2
+  40 0004 0523     		movs	r3, #5
+  41 0006 ADF80430 		strh	r3, [sp, #4]	@ movhi
+  41:External/flash_driver/Src/flash_driver.c ****     FLASH_DRIVER_GET_STATUS_1_CMD,
+  42:External/flash_driver/Src/flash_driver.c ****     FLASH_DRIVER_DUMMY_BYTE
+  43:External/flash_driver/Src/flash_driver.c ****   };
+  44:External/flash_driver/Src/flash_driver.c ****   uint8_t input_data[2];
+  42              		.loc 1 44 3 is_stmt 1 view .LVU3
+  45:External/flash_driver/Src/flash_driver.c **** 
+  46:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(true);
+  43              		.loc 1 46 3 view .LVU4
+  44 000a 0120     		movs	r0, #1
+  45 000c FFF7FEFF 		bl	flash_driver_select
+  46              	.LVL0:
+  47:External/flash_driver/Src/flash_driver.c ****   flash_driver_status status = flash_driver_io_write_read(
+  47              		.loc 1 47 3 view .LVU5
+  48              		.loc 1 47 32 is_stmt 0 view .LVU6
+  49 0010 0222     		movs	r2, #2
+  50 0012 6946     		mov	r1, sp
+  51 0014 01A8     		add	r0, sp, #4
+  52 0016 FFF7FEFF 		bl	flash_driver_io_write_read
+  53              	.LVL1:
+  54 001a 0446     		mov	r4, r0
+  55              	.LVL2:
+  48:External/flash_driver/Src/flash_driver.c ****     output_data, input_data, sizeof(output_data)
+  49:External/flash_driver/Src/flash_driver.c ****   );
+  50:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(false);
+  56              		.loc 1 50 3 is_stmt 1 view .LVU7
+  57 001c 0020     		movs	r0, #0
+  58 001e FFF7FEFF 		bl	flash_driver_select
+  59              	.LVL3:
+  51:External/flash_driver/Src/flash_driver.c **** 
+  52:External/flash_driver/Src/flash_driver.c ****   if (status)
+  60              		.loc 1 52 3 view .LVU8
+  61              		.loc 1 52 6 is_stmt 0 view .LVU9
+  62 0022 24B9     		cbnz	r4, .L2
+  53:External/flash_driver/Src/flash_driver.c ****     return status;
+ARM GAS  /tmp/cce4S0sR.s 			page 3
+
+
+  54:External/flash_driver/Src/flash_driver.c ****   
+  55:External/flash_driver/Src/flash_driver.c ****   return input_data[0] & FLASH_DRIVER_BUSY_BIT ?
+  63              		.loc 1 55 3 is_stmt 1 view .LVU10
+  64              		.loc 1 55 20 is_stmt 0 view .LVU11
+  65 0024 9DF80040 		ldrb	r4, [sp]	@ zero_extendqisi2
+  66              	.LVL4:
+  56:External/flash_driver/Src/flash_driver.c ****     FLASH_DRIVER_BUSY : FLASH_DRIVER_OK;
+  67              		.loc 1 56 23 view .LVU12
+  68 0028 6400     		lsls	r4, r4, #1
+  69 002a 04F00204 		and	r4, r4, #2
+  70              	.L2:
+  57:External/flash_driver/Src/flash_driver.c **** }
+  71              		.loc 1 57 1 view .LVU13
+  72 002e 2046     		mov	r0, r4
+  73 0030 02B0     		add	sp, sp, #8
+  74              	.LCFI2:
+  75              		.cfi_def_cfa_offset 8
+  76              		@ sp needed
+  77 0032 10BD     		pop	{r4, pc}
+  78              		.cfi_endproc
+  79              	.LFE2:
+  81              		.section	.text.flash_driver_write_enable,"ax",%progbits
+  82              		.align	1
+  83              		.syntax unified
+  84              		.thumb
+  85              		.thumb_func
+  87              	flash_driver_write_enable:
+  88              	.LFB1:
+  26:External/flash_driver/Src/flash_driver.c ****   uint8_t output_data = FLASH_DRIVER_WRITE_ENABLE_CMD;
+  89              		.loc 1 26 1 is_stmt 1 view -0
+  90              		.cfi_startproc
+  91              		@ args = 0, pretend = 0, frame = 8
+  92              		@ frame_needed = 0, uses_anonymous_args = 0
+  93 0000 10B5     		push	{r4, lr}
+  94              	.LCFI3:
+  95              		.cfi_def_cfa_offset 8
+  96              		.cfi_offset 4, -8
+  97              		.cfi_offset 14, -4
+  98 0002 82B0     		sub	sp, sp, #8
+  99              	.LCFI4:
+ 100              		.cfi_def_cfa_offset 16
+  27:External/flash_driver/Src/flash_driver.c **** 
+ 101              		.loc 1 27 3 view .LVU15
+  27:External/flash_driver/Src/flash_driver.c **** 
+ 102              		.loc 1 27 11 is_stmt 0 view .LVU16
+ 103 0004 0623     		movs	r3, #6
+ 104 0006 8DF80730 		strb	r3, [sp, #7]
+  29:External/flash_driver/Src/flash_driver.c ****   flash_driver_status status = flash_driver_io_write(
+ 105              		.loc 1 29 3 is_stmt 1 view .LVU17
+ 106 000a 0120     		movs	r0, #1
+ 107 000c FFF7FEFF 		bl	flash_driver_select
+ 108              	.LVL5:
+  30:External/flash_driver/Src/flash_driver.c ****     &output_data, sizeof(uint8_t)
+ 109              		.loc 1 30 3 view .LVU18
+  30:External/flash_driver/Src/flash_driver.c ****     &output_data, sizeof(uint8_t)
+ 110              		.loc 1 30 32 is_stmt 0 view .LVU19
+ 111 0010 0121     		movs	r1, #1
+ARM GAS  /tmp/cce4S0sR.s 			page 4
+
+
+ 112 0012 0DF10700 		add	r0, sp, #7
+ 113 0016 FFF7FEFF 		bl	flash_driver_io_write
+ 114              	.LVL6:
+ 115 001a 0446     		mov	r4, r0
+ 116              	.LVL7:
+  33:External/flash_driver/Src/flash_driver.c **** 
+ 117              		.loc 1 33 3 is_stmt 1 view .LVU20
+ 118 001c 0020     		movs	r0, #0
+ 119 001e FFF7FEFF 		bl	flash_driver_select
+ 120              	.LVL8:
+  35:External/flash_driver/Src/flash_driver.c **** }
+ 121              		.loc 1 35 3 view .LVU21
+  36:External/flash_driver/Src/flash_driver.c **** 
+ 122              		.loc 1 36 1 is_stmt 0 view .LVU22
+ 123 0022 2046     		mov	r0, r4
+ 124 0024 02B0     		add	sp, sp, #8
+ 125              	.LCFI5:
+ 126              		.cfi_def_cfa_offset 8
+ 127              		@ sp needed
+ 128 0026 10BD     		pop	{r4, pc}
+  36:External/flash_driver/Src/flash_driver.c **** 
+ 129              		.loc 1 36 1 view .LVU23
+ 130              		.cfi_endproc
+ 131              	.LFE1:
+ 133              		.section	.text.flash_driver_check_link,"ax",%progbits
+ 134              		.align	1
+ 135              		.global	flash_driver_check_link
+ 136              		.syntax unified
+ 137              		.thumb
+ 138              		.thumb_func
+ 140              	flash_driver_check_link:
+ 141              	.LFB3:
+  58:External/flash_driver/Src/flash_driver.c **** 
+  59:External/flash_driver/Src/flash_driver.c **** // Implementations -----------------------------------------------------------
+  60:External/flash_driver/Src/flash_driver.c **** 
+  61:External/flash_driver/Src/flash_driver.c **** // Winbond W25Q128JV datasheet (pg. 23) - Manufacturer/Device ID cmd = 90h
+  62:External/flash_driver/Src/flash_driver.c **** flash_driver_status flash_driver_check_link()
+  63:External/flash_driver/Src/flash_driver.c **** {
+ 142              		.loc 1 63 1 is_stmt 1 view -0
+ 143              		.cfi_startproc
+ 144              		@ args = 0, pretend = 0, frame = 16
+ 145              		@ frame_needed = 0, uses_anonymous_args = 0
+ 146 0000 10B5     		push	{r4, lr}
+ 147              	.LCFI6:
+ 148              		.cfi_def_cfa_offset 8
+ 149              		.cfi_offset 4, -8
+ 150              		.cfi_offset 14, -4
+ 151 0002 84B0     		sub	sp, sp, #16
+ 152              	.LCFI7:
+ 153              		.cfi_def_cfa_offset 24
+  64:External/flash_driver/Src/flash_driver.c ****   uint8_t output_data[6] = {
+ 154              		.loc 1 64 3 view .LVU25
+ 155              		.loc 1 64 11 is_stmt 0 view .LVU26
+ 156 0004 9023     		movs	r3, #144
+ 157 0006 0293     		str	r3, [sp, #8]
+ 158 0008 0023     		movs	r3, #0
+ 159 000a ADF80C30 		strh	r3, [sp, #12]	@ movhi
+ARM GAS  /tmp/cce4S0sR.s 			page 5
+
+
+  65:External/flash_driver/Src/flash_driver.c ****     FLASH_DRIVER_ID_CMD,
+  66:External/flash_driver/Src/flash_driver.c ****     FLASH_DRIVER_DUMMY_BYTE,
+  67:External/flash_driver/Src/flash_driver.c ****     FLASH_DRIVER_DUMMY_BYTE,
+  68:External/flash_driver/Src/flash_driver.c ****     0x0,
+  69:External/flash_driver/Src/flash_driver.c ****     FLASH_DRIVER_DUMMY_BYTE,
+  70:External/flash_driver/Src/flash_driver.c ****     FLASH_DRIVER_DUMMY_BYTE
+  71:External/flash_driver/Src/flash_driver.c ****   };
+  72:External/flash_driver/Src/flash_driver.c ****   uint8_t input_data[6];
+ 160              		.loc 1 72 3 is_stmt 1 view .LVU27
+  73:External/flash_driver/Src/flash_driver.c **** 
+  74:External/flash_driver/Src/flash_driver.c **** 
+  75:External/flash_driver/Src/flash_driver.c ****   flash_driver_status status = flash_driver_is_busy();
+ 161              		.loc 1 75 3 view .LVU28
+ 162              		.loc 1 75 32 is_stmt 0 view .LVU29
+ 163 000e FFF7FEFF 		bl	flash_driver_is_busy
+ 164              	.LVL9:
+  76:External/flash_driver/Src/flash_driver.c ****   if (status)
+ 165              		.loc 1 76 3 is_stmt 1 view .LVU30
+ 166              		.loc 1 76 6 is_stmt 0 view .LVU31
+ 167 0012 0446     		mov	r4, r0
+ 168 0014 10B1     		cbz	r0, .L10
+ 169              	.LVL10:
+ 170              	.L7:
+  77:External/flash_driver/Src/flash_driver.c ****     return status;
+  78:External/flash_driver/Src/flash_driver.c ****   
+  79:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(true);
+  80:External/flash_driver/Src/flash_driver.c ****   status = flash_driver_io_write_read(
+  81:External/flash_driver/Src/flash_driver.c ****     output_data, input_data, sizeof(output_data)
+  82:External/flash_driver/Src/flash_driver.c ****   );
+  83:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(false);
+  84:External/flash_driver/Src/flash_driver.c **** 
+  85:External/flash_driver/Src/flash_driver.c ****   if (status)
+  86:External/flash_driver/Src/flash_driver.c ****     return status;
+  87:External/flash_driver/Src/flash_driver.c ****   if (input_data[4] == FLASH_DRIVER_MANUFACTURER_ID &&
+  88:External/flash_driver/Src/flash_driver.c ****     input_data[5] == FLASH_DRIVER_DEVICE_ID)
+  89:External/flash_driver/Src/flash_driver.c ****     return FLASH_DRIVER_OK;
+  90:External/flash_driver/Src/flash_driver.c ****   else
+  91:External/flash_driver/Src/flash_driver.c ****     return FLASH_DRIVER_ERROR;
+  92:External/flash_driver/Src/flash_driver.c **** }
+ 171              		.loc 1 92 1 view .LVU32
+ 172 0016 2046     		mov	r0, r4
+ 173 0018 04B0     		add	sp, sp, #16
+ 174              	.LCFI8:
+ 175              		.cfi_remember_state
+ 176              		.cfi_def_cfa_offset 8
+ 177              		@ sp needed
+ 178 001a 10BD     		pop	{r4, pc}
+ 179              	.LVL11:
+ 180              	.L10:
+ 181              	.LCFI9:
+ 182              		.cfi_restore_state
+  79:External/flash_driver/Src/flash_driver.c ****   status = flash_driver_io_write_read(
+ 183              		.loc 1 79 3 is_stmt 1 view .LVU33
+ 184 001c 0120     		movs	r0, #1
+ 185              	.LVL12:
+  79:External/flash_driver/Src/flash_driver.c ****   status = flash_driver_io_write_read(
+ 186              		.loc 1 79 3 is_stmt 0 view .LVU34
+ARM GAS  /tmp/cce4S0sR.s 			page 6
+
+
+ 187 001e FFF7FEFF 		bl	flash_driver_select
+ 188              	.LVL13:
+  80:External/flash_driver/Src/flash_driver.c ****     output_data, input_data, sizeof(output_data)
+ 189              		.loc 1 80 3 is_stmt 1 view .LVU35
+  80:External/flash_driver/Src/flash_driver.c ****     output_data, input_data, sizeof(output_data)
+ 190              		.loc 1 80 12 is_stmt 0 view .LVU36
+ 191 0022 0622     		movs	r2, #6
+ 192 0024 6946     		mov	r1, sp
+ 193 0026 02A8     		add	r0, sp, #8
+ 194 0028 FFF7FEFF 		bl	flash_driver_io_write_read
+ 195              	.LVL14:
+ 196 002c 0446     		mov	r4, r0
+ 197              	.LVL15:
+  83:External/flash_driver/Src/flash_driver.c **** 
+ 198              		.loc 1 83 3 is_stmt 1 view .LVU37
+ 199 002e 0020     		movs	r0, #0
+ 200 0030 FFF7FEFF 		bl	flash_driver_select
+ 201              	.LVL16:
+  85:External/flash_driver/Src/flash_driver.c ****     return status;
+ 202              		.loc 1 85 3 view .LVU38
+  85:External/flash_driver/Src/flash_driver.c ****     return status;
+ 203              		.loc 1 85 6 is_stmt 0 view .LVU39
+ 204 0034 002C     		cmp	r4, #0
+ 205 0036 EED1     		bne	.L7
+  87:External/flash_driver/Src/flash_driver.c ****     input_data[5] == FLASH_DRIVER_DEVICE_ID)
+ 206              		.loc 1 87 3 is_stmt 1 view .LVU40
+  87:External/flash_driver/Src/flash_driver.c ****     input_data[5] == FLASH_DRIVER_DEVICE_ID)
+ 207              		.loc 1 87 17 is_stmt 0 view .LVU41
+ 208 0038 9DF80430 		ldrb	r3, [sp, #4]	@ zero_extendqisi2
+  87:External/flash_driver/Src/flash_driver.c ****     input_data[5] == FLASH_DRIVER_DEVICE_ID)
+ 209              		.loc 1 87 6 view .LVU42
+ 210 003c EF2B     		cmp	r3, #239
+ 211 003e 05D1     		bne	.L8
+  88:External/flash_driver/Src/flash_driver.c ****     return FLASH_DRIVER_OK;
+ 212              		.loc 1 88 15 view .LVU43
+ 213 0040 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+  87:External/flash_driver/Src/flash_driver.c ****     input_data[5] == FLASH_DRIVER_DEVICE_ID)
+ 214              		.loc 1 87 53 discriminator 1 view .LVU44
+ 215 0044 172B     		cmp	r3, #23
+ 216 0046 E6D0     		beq	.L7
+  91:External/flash_driver/Src/flash_driver.c **** }
+ 217              		.loc 1 91 12 view .LVU45
+ 218 0048 0124     		movs	r4, #1
+ 219              	.LVL17:
+  91:External/flash_driver/Src/flash_driver.c **** }
+ 220              		.loc 1 91 12 view .LVU46
+ 221 004a E4E7     		b	.L7
+ 222              	.LVL18:
+ 223              	.L8:
+  91:External/flash_driver/Src/flash_driver.c **** }
+ 224              		.loc 1 91 12 view .LVU47
+ 225 004c 0124     		movs	r4, #1
+ 226              	.LVL19:
+  91:External/flash_driver/Src/flash_driver.c **** }
+ 227              		.loc 1 91 12 view .LVU48
+ 228 004e E2E7     		b	.L7
+ 229              		.cfi_endproc
+ARM GAS  /tmp/cce4S0sR.s 			page 7
+
+
+ 230              	.LFE3:
+ 232              		.section	.text.flash_driver_write,"ax",%progbits
+ 233              		.align	1
+ 234              		.global	flash_driver_write
+ 235              		.syntax unified
+ 236              		.thumb
+ 237              		.thumb_func
+ 239              	flash_driver_write:
+ 240              	.LVL20:
+ 241              	.LFB4:
+  93:External/flash_driver/Src/flash_driver.c **** 
+  94:External/flash_driver/Src/flash_driver.c **** // The Page Program instruction allows from one byte to 256 bytes (a page)
+  95:External/flash_driver/Src/flash_driver.c **** // of data to be programmed at previously erased (FFh) memory locations.
+  96:External/flash_driver/Src/flash_driver.c **** // Winbond W25Q128JV datasheet (pg. 36)
+  97:External/flash_driver/Src/flash_driver.c **** flash_driver_status flash_driver_write(
+  98:External/flash_driver/Src/flash_driver.c ****   const uint32_t address,
+  99:External/flash_driver/Src/flash_driver.c ****   const uint8_t *const data,
+ 100:External/flash_driver/Src/flash_driver.c ****   const uint16_t data_size
+ 101:External/flash_driver/Src/flash_driver.c **** )
+ 102:External/flash_driver/Src/flash_driver.c **** {
+ 242              		.loc 1 102 1 is_stmt 1 view -0
+ 243              		.cfi_startproc
+ 244              		@ args = 0, pretend = 0, frame = 8
+ 245              		@ frame_needed = 0, uses_anonymous_args = 0
+ 246              		.loc 1 102 1 is_stmt 0 view .LVU50
+ 247 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 248              	.LCFI10:
+ 249              		.cfi_def_cfa_offset 24
+ 250              		.cfi_offset 4, -24
+ 251              		.cfi_offset 5, -20
+ 252              		.cfi_offset 6, -16
+ 253              		.cfi_offset 7, -12
+ 254              		.cfi_offset 8, -8
+ 255              		.cfi_offset 14, -4
+ 256 0004 82B0     		sub	sp, sp, #8
+ 257              	.LCFI11:
+ 258              		.cfi_def_cfa_offset 32
+ 103:External/flash_driver/Src/flash_driver.c ****   if (data_size == 0)
+ 259              		.loc 1 103 3 is_stmt 1 view .LVU51
+ 260              		.loc 1 103 6 is_stmt 0 view .LVU52
+ 261 0006 BAB3     		cbz	r2, .L13
+ 262 0008 0546     		mov	r5, r0
+ 263 000a 0E46     		mov	r6, r1
+ 264 000c 1746     		mov	r7, r2
+ 104:External/flash_driver/Src/flash_driver.c ****     return FLASH_DRIVER_INVALID_ARGS;
+ 105:External/flash_driver/Src/flash_driver.c **** 
+ 106:External/flash_driver/Src/flash_driver.c ****   flash_driver_status status = flash_driver_is_busy();
+ 265              		.loc 1 106 3 is_stmt 1 view .LVU53
+ 266              		.loc 1 106 32 is_stmt 0 view .LVU54
+ 267 000e FFF7FEFF 		bl	flash_driver_is_busy
+ 268              	.LVL21:
+ 269              		.loc 1 106 32 view .LVU55
+ 270 0012 0446     		mov	r4, r0
+ 271              	.LVL22:
+ 107:External/flash_driver/Src/flash_driver.c ****   status |= flash_driver_write_enable();
+ 272              		.loc 1 107 3 is_stmt 1 view .LVU56
+ 273              		.loc 1 107 13 is_stmt 0 view .LVU57
+ARM GAS  /tmp/cce4S0sR.s 			page 8
+
+
+ 274 0014 FFF7FEFF 		bl	flash_driver_write_enable
+ 275              	.LVL23:
+ 276              		.loc 1 107 10 discriminator 1 view .LVU58
+ 277 0018 0443     		orrs	r4, r4, r0
+ 278              	.LVL24:
+ 108:External/flash_driver/Src/flash_driver.c ****   if (status)
+ 279              		.loc 1 108 3 is_stmt 1 view .LVU59
+ 280              		.loc 1 108 6 is_stmt 0 view .LVU60
+ 281 001a 14F0FF04 		ands	r4, r4, #255
+ 282              	.LVL25:
+ 283              		.loc 1 108 6 view .LVU61
+ 284 001e 2CD1     		bne	.L12
+ 109:External/flash_driver/Src/flash_driver.c ****     return status;
+ 110:External/flash_driver/Src/flash_driver.c **** 
+ 111:External/flash_driver/Src/flash_driver.c ****   uint8_t *output_data = malloc(4 + data_size);
+ 285              		.loc 1 111 3 is_stmt 1 view .LVU62
+ 286              		.loc 1 111 26 is_stmt 0 view .LVU63
+ 287 0020 381D     		adds	r0, r7, #4
+ 288 0022 FFF7FEFF 		bl	malloc
+ 289              	.LVL26:
+ 290 0026 8046     		mov	r8, r0
+ 291              	.LVL27:
+ 112:External/flash_driver/Src/flash_driver.c ****   uint32_t reversed_addr = flash_driver_reverse_addr(address);
+ 292              		.loc 1 112 3 is_stmt 1 view .LVU64
+ 293              	.LBB8:
+ 294              	.LBI8:
+  13:External/flash_driver/Src/flash_driver.c **** {
+ 295              		.loc 1 13 24 view .LVU65
+ 296              	.LBB9:
+  15:External/flash_driver/Src/flash_driver.c ****   result |= address & 0xff00;
+ 297              		.loc 1 15 3 view .LVU66
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 298              		.loc 1 16 3 view .LVU67
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 299              		.loc 1 16 21 is_stmt 0 view .LVU68
+ 300 0028 05F47F43 		and	r3, r5, #65280
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 301              		.loc 1 16 10 view .LVU69
+ 302 002c 43EA0543 		orr	r3, r3, r5, lsl #16
+ 303              	.LVL28:
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 304              		.loc 1 17 3 is_stmt 1 view .LVU70
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 305              		.loc 1 17 34 is_stmt 0 view .LVU71
+ 306 0030 C5F30745 		ubfx	r5, r5, #16, #8
+ 307              	.LVL29:
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 308              		.loc 1 17 10 view .LVU72
+ 309 0034 2B43     		orrs	r3, r3, r5
+ 310              	.LVL30:
+  19:External/flash_driver/Src/flash_driver.c **** }
+ 311              		.loc 1 19 3 is_stmt 1 view .LVU73
+  19:External/flash_driver/Src/flash_driver.c **** }
+ 312              		.loc 1 19 3 is_stmt 0 view .LVU74
+ 313              	.LBE9:
+ 314              	.LBE8:
+ 315              		.loc 1 112 12 discriminator 1 view .LVU75
+ARM GAS  /tmp/cce4S0sR.s 			page 9
+
+
+ 316 0036 0193     		str	r3, [sp, #4]
+ 113:External/flash_driver/Src/flash_driver.c ****   output_data[0] = FLASH_DRIVER_PAGE_PROGRAM_CMD;
+ 317              		.loc 1 113 3 is_stmt 1 view .LVU76
+ 318              		.loc 1 113 18 is_stmt 0 view .LVU77
+ 319 0038 0346     		mov	r3, r0
+ 320 003a 0222     		movs	r2, #2
+ 321 003c 03F8012B 		strb	r2, [r3], #1
+ 114:External/flash_driver/Src/flash_driver.c ****   memcpy(output_data + 1, (uint8_t*)&reversed_addr, 3);
+ 322              		.loc 1 114 3 is_stmt 1 view .LVU78
+ 323 0040 BDF80410 		ldrh	r1, [sp, #4]	@ unaligned
+ 324 0044 9DF80620 		ldrb	r2, [sp, #6]	@ zero_extendqisi2
+ 325 0048 A0F80110 		strh	r1, [r0, #1]	@ unaligned
+ 326 004c 9A70     		strb	r2, [r3, #2]
+ 115:External/flash_driver/Src/flash_driver.c ****   memcpy(output_data + 4, data, data_size);
+ 327              		.loc 1 115 3 view .LVU79
+ 328 004e 3A46     		mov	r2, r7
+ 329 0050 3146     		mov	r1, r6
+ 330 0052 0430     		adds	r0, r0, #4
+ 331              	.LVL31:
+ 332              		.loc 1 115 3 is_stmt 0 view .LVU80
+ 333 0054 FFF7FEFF 		bl	memcpy
+ 334              	.LVL32:
+ 116:External/flash_driver/Src/flash_driver.c **** 
+ 117:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(true);
+ 335              		.loc 1 117 3 is_stmt 1 view .LVU81
+ 336 0058 0120     		movs	r0, #1
+ 337 005a FFF7FEFF 		bl	flash_driver_select
+ 338              	.LVL33:
+ 118:External/flash_driver/Src/flash_driver.c ****   status = flash_driver_io_write(
+ 339              		.loc 1 118 3 view .LVU82
+ 340              		.loc 1 118 12 is_stmt 0 view .LVU83
+ 341 005e 391D     		adds	r1, r7, #4
+ 342 0060 C9B2     		uxtb	r1, r1
+ 343 0062 4046     		mov	r0, r8
+ 344 0064 FFF7FEFF 		bl	flash_driver_io_write
+ 345              	.LVL34:
+ 346 0068 0446     		mov	r4, r0
+ 347              	.LVL35:
+ 119:External/flash_driver/Src/flash_driver.c ****     output_data, 4 + data_size
+ 120:External/flash_driver/Src/flash_driver.c ****   );
+ 121:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(false);
+ 348              		.loc 1 121 3 is_stmt 1 view .LVU84
+ 349 006a 0020     		movs	r0, #0
+ 350 006c FFF7FEFF 		bl	flash_driver_select
+ 351              	.LVL36:
+ 122:External/flash_driver/Src/flash_driver.c **** 
+ 123:External/flash_driver/Src/flash_driver.c ****   free(output_data);
+ 352              		.loc 1 123 3 view .LVU85
+ 353 0070 4046     		mov	r0, r8
+ 354 0072 FFF7FEFF 		bl	free
+ 355              	.LVL37:
+ 124:External/flash_driver/Src/flash_driver.c **** 
+ 125:External/flash_driver/Src/flash_driver.c ****   return status;
+ 356              		.loc 1 125 3 view .LVU86
+ 357              		.loc 1 125 10 is_stmt 0 view .LVU87
+ 358 0076 00E0     		b	.L12
+ 359              	.LVL38:
+ARM GAS  /tmp/cce4S0sR.s 			page 10
+
+
+ 360              	.L13:
+ 104:External/flash_driver/Src/flash_driver.c **** 
+ 361              		.loc 1 104 12 view .LVU88
+ 362 0078 0524     		movs	r4, #5
+ 363              	.LVL39:
+ 364              	.L12:
+ 126:External/flash_driver/Src/flash_driver.c **** }
+ 365              		.loc 1 126 1 view .LVU89
+ 366 007a 2046     		mov	r0, r4
+ 367 007c 02B0     		add	sp, sp, #8
+ 368              	.LCFI12:
+ 369              		.cfi_def_cfa_offset 24
+ 370              		@ sp needed
+ 371 007e BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 372              		.cfi_endproc
+ 373              	.LFE4:
+ 375              		.section	.text.flash_driver_read,"ax",%progbits
+ 376              		.align	1
+ 377              		.global	flash_driver_read
+ 378              		.syntax unified
+ 379              		.thumb
+ 380              		.thumb_func
+ 382              	flash_driver_read:
+ 383              	.LVL40:
+ 384              	.LFB5:
+ 127:External/flash_driver/Src/flash_driver.c **** 
+ 128:External/flash_driver/Src/flash_driver.c **** // The Read Data instruction allows one or more data bytes to be sequentially
+ 129:External/flash_driver/Src/flash_driver.c **** // read from the memory. the entire memory can be accessed with a single 
+ 130:External/flash_driver/Src/flash_driver.c **** // instruction as long as the clock continues.
+ 131:External/flash_driver/Src/flash_driver.c **** // Winbond W25Q128JV datasheet (pg. 28)
+ 132:External/flash_driver/Src/flash_driver.c **** flash_driver_status flash_driver_read(
+ 133:External/flash_driver/Src/flash_driver.c ****   uint32_t address,
+ 134:External/flash_driver/Src/flash_driver.c ****   uint8_t *data,
+ 135:External/flash_driver/Src/flash_driver.c ****   uint16_t data_size
+ 136:External/flash_driver/Src/flash_driver.c **** )
+ 137:External/flash_driver/Src/flash_driver.c **** {
+ 385              		.loc 1 137 1 is_stmt 1 view -0
+ 386              		.cfi_startproc
+ 387              		@ args = 0, pretend = 0, frame = 8
+ 388              		@ frame_needed = 0, uses_anonymous_args = 0
+ 389              		.loc 1 137 1 is_stmt 0 view .LVU91
+ 390 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 391              	.LCFI13:
+ 392              		.cfi_def_cfa_offset 28
+ 393              		.cfi_offset 4, -28
+ 394              		.cfi_offset 5, -24
+ 395              		.cfi_offset 6, -20
+ 396              		.cfi_offset 7, -16
+ 397              		.cfi_offset 8, -12
+ 398              		.cfi_offset 9, -8
+ 399              		.cfi_offset 14, -4
+ 400 0004 83B0     		sub	sp, sp, #12
+ 401              	.LCFI14:
+ 402              		.cfi_def_cfa_offset 40
+ 138:External/flash_driver/Src/flash_driver.c ****   if (data_size == 0)
+ 403              		.loc 1 138 3 is_stmt 1 view .LVU92
+ 404              		.loc 1 138 6 is_stmt 0 view .LVU93
+ARM GAS  /tmp/cce4S0sR.s 			page 11
+
+
+ 405 0006 002A     		cmp	r2, #0
+ 406 0008 3ED0     		beq	.L18
+ 407 000a 0646     		mov	r6, r0
+ 408 000c 0F46     		mov	r7, r1
+ 409 000e 9046     		mov	r8, r2
+ 139:External/flash_driver/Src/flash_driver.c ****     return FLASH_DRIVER_INVALID_ARGS;
+ 140:External/flash_driver/Src/flash_driver.c ****   flash_driver_status status = flash_driver_is_busy();
+ 410              		.loc 1 140 3 is_stmt 1 view .LVU94
+ 411              		.loc 1 140 32 is_stmt 0 view .LVU95
+ 412 0010 FFF7FEFF 		bl	flash_driver_is_busy
+ 413              	.LVL41:
+ 141:External/flash_driver/Src/flash_driver.c ****   if (status)
+ 414              		.loc 1 141 3 is_stmt 1 view .LVU96
+ 415              		.loc 1 141 6 is_stmt 0 view .LVU97
+ 416 0014 0446     		mov	r4, r0
+ 417 0016 C0BB     		cbnz	r0, .L16
+ 142:External/flash_driver/Src/flash_driver.c ****     return status;
+ 143:External/flash_driver/Src/flash_driver.c **** 
+ 144:External/flash_driver/Src/flash_driver.c ****   uint8_t *output_data = malloc(4 + data_size);
+ 418              		.loc 1 144 3 is_stmt 1 view .LVU98
+ 419              		.loc 1 144 35 is_stmt 0 view .LVU99
+ 420 0018 08F10404 		add	r4, r8, #4
+ 421              		.loc 1 144 26 view .LVU100
+ 422 001c 2046     		mov	r0, r4
+ 423              	.LVL42:
+ 424              		.loc 1 144 26 view .LVU101
+ 425 001e FFF7FEFF 		bl	malloc
+ 426              	.LVL43:
+ 427 0022 0546     		mov	r5, r0
+ 428              	.LVL44:
+ 145:External/flash_driver/Src/flash_driver.c ****   uint8_t *input_data = malloc(4 + data_size);
+ 429              		.loc 1 145 3 is_stmt 1 view .LVU102
+ 430              		.loc 1 145 25 is_stmt 0 view .LVU103
+ 431 0024 2046     		mov	r0, r4
+ 432              	.LVL45:
+ 433              		.loc 1 145 25 view .LVU104
+ 434 0026 FFF7FEFF 		bl	malloc
+ 435              	.LVL46:
+ 436 002a 8146     		mov	r9, r0
+ 437              	.LVL47:
+ 146:External/flash_driver/Src/flash_driver.c **** 
+ 147:External/flash_driver/Src/flash_driver.c ****   output_data[0] = FLASH_DRIVER_READ_CMD;
+ 438              		.loc 1 147 3 is_stmt 1 view .LVU105
+ 439              		.loc 1 147 18 is_stmt 0 view .LVU106
+ 440 002c 2946     		mov	r1, r5
+ 441 002e 0323     		movs	r3, #3
+ 442 0030 01F8013B 		strb	r3, [r1], #1
+ 148:External/flash_driver/Src/flash_driver.c ****   uint32_t reversed_addr = flash_driver_reverse_addr(address);
+ 443              		.loc 1 148 3 is_stmt 1 view .LVU107
+ 444              	.LVL48:
+ 445              	.LBB10:
+ 446              	.LBI10:
+  13:External/flash_driver/Src/flash_driver.c **** {
+ 447              		.loc 1 13 24 view .LVU108
+ 448              	.LBB11:
+  15:External/flash_driver/Src/flash_driver.c ****   result |= address & 0xff00;
+ 449              		.loc 1 15 3 view .LVU109
+ARM GAS  /tmp/cce4S0sR.s 			page 12
+
+
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 450              		.loc 1 16 3 view .LVU110
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 451              		.loc 1 16 21 is_stmt 0 view .LVU111
+ 452 0034 06F47F43 		and	r3, r6, #65280
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 453              		.loc 1 16 10 view .LVU112
+ 454 0038 43EA0642 		orr	r2, r3, r6, lsl #16
+ 455              	.LVL49:
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 456              		.loc 1 17 3 is_stmt 1 view .LVU113
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 457              		.loc 1 17 34 is_stmt 0 view .LVU114
+ 458 003c C6F30743 		ubfx	r3, r6, #16, #8
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 459              		.loc 1 17 10 view .LVU115
+ 460 0040 1343     		orrs	r3, r3, r2
+ 461              	.LVL50:
+  19:External/flash_driver/Src/flash_driver.c **** }
+ 462              		.loc 1 19 3 is_stmt 1 view .LVU116
+  19:External/flash_driver/Src/flash_driver.c **** }
+ 463              		.loc 1 19 3 is_stmt 0 view .LVU117
+ 464              	.LBE11:
+ 465              	.LBE10:
+ 466              		.loc 1 148 12 discriminator 1 view .LVU118
+ 467 0042 0193     		str	r3, [sp, #4]
+ 149:External/flash_driver/Src/flash_driver.c ****   memcpy(output_data + 1, (uint8_t*)&reversed_addr, 3);
+ 468              		.loc 1 149 3 is_stmt 1 view .LVU119
+ 469 0044 BDF80420 		ldrh	r2, [sp, #4]	@ unaligned
+ 470 0048 9DF80630 		ldrb	r3, [sp, #6]	@ zero_extendqisi2
+ 471 004c A5F80120 		strh	r2, [r5, #1]	@ unaligned
+ 472 0050 8B70     		strb	r3, [r1, #2]
+ 150:External/flash_driver/Src/flash_driver.c **** 
+ 151:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(true);
+ 473              		.loc 1 151 3 view .LVU120
+ 474 0052 0120     		movs	r0, #1
+ 475              	.LVL51:
+ 476              		.loc 1 151 3 is_stmt 0 view .LVU121
+ 477 0054 FFF7FEFF 		bl	flash_driver_select
+ 478              	.LVL52:
+ 152:External/flash_driver/Src/flash_driver.c ****   status = flash_driver_io_write_read(
+ 479              		.loc 1 152 3 is_stmt 1 view .LVU122
+ 480              		.loc 1 152 12 is_stmt 0 view .LVU123
+ 481 0058 E2B2     		uxtb	r2, r4
+ 482 005a 4946     		mov	r1, r9
+ 483 005c 2846     		mov	r0, r5
+ 484 005e FFF7FEFF 		bl	flash_driver_io_write_read
+ 485              	.LVL53:
+ 486 0062 0446     		mov	r4, r0
+ 487              	.LVL54:
+ 153:External/flash_driver/Src/flash_driver.c ****     output_data, input_data, 4 + data_size
+ 154:External/flash_driver/Src/flash_driver.c ****   );
+ 155:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(false);
+ 488              		.loc 1 155 3 is_stmt 1 view .LVU124
+ 489 0064 0020     		movs	r0, #0
+ 490 0066 FFF7FEFF 		bl	flash_driver_select
+ 491              	.LVL55:
+ARM GAS  /tmp/cce4S0sR.s 			page 13
+
+
+ 156:External/flash_driver/Src/flash_driver.c **** 
+ 157:External/flash_driver/Src/flash_driver.c ****   if (status == FLASH_DRIVER_OK)
+ 492              		.loc 1 157 3 view .LVU125
+ 493              		.loc 1 157 6 is_stmt 0 view .LVU126
+ 494 006a 34B1     		cbz	r4, .L20
+ 495              	.L17:
+ 158:External/flash_driver/Src/flash_driver.c ****     memcpy(data, input_data + 4, data_size);
+ 159:External/flash_driver/Src/flash_driver.c **** 
+ 160:External/flash_driver/Src/flash_driver.c ****   free(output_data);
+ 496              		.loc 1 160 3 is_stmt 1 view .LVU127
+ 497 006c 2846     		mov	r0, r5
+ 498 006e FFF7FEFF 		bl	free
+ 499              	.LVL56:
+ 161:External/flash_driver/Src/flash_driver.c ****   free(input_data);
+ 500              		.loc 1 161 3 view .LVU128
+ 501 0072 4846     		mov	r0, r9
+ 502 0074 FFF7FEFF 		bl	free
+ 503              	.LVL57:
+ 162:External/flash_driver/Src/flash_driver.c ****   return status;
+ 504              		.loc 1 162 3 view .LVU129
+ 505              		.loc 1 162 10 is_stmt 0 view .LVU130
+ 506 0078 07E0     		b	.L16
+ 507              	.L20:
+ 158:External/flash_driver/Src/flash_driver.c ****     memcpy(data, input_data + 4, data_size);
+ 508              		.loc 1 158 5 is_stmt 1 view .LVU131
+ 509 007a 4246     		mov	r2, r8
+ 510 007c 09F10401 		add	r1, r9, #4
+ 511 0080 3846     		mov	r0, r7
+ 512 0082 FFF7FEFF 		bl	memcpy
+ 513              	.LVL58:
+ 514 0086 F1E7     		b	.L17
+ 515              	.LVL59:
+ 516              	.L18:
+ 139:External/flash_driver/Src/flash_driver.c ****   flash_driver_status status = flash_driver_is_busy();
+ 517              		.loc 1 139 12 is_stmt 0 view .LVU132
+ 518 0088 0524     		movs	r4, #5
+ 519              	.LVL60:
+ 520              	.L16:
+ 163:External/flash_driver/Src/flash_driver.c **** }
+ 521              		.loc 1 163 1 view .LVU133
+ 522 008a 2046     		mov	r0, r4
+ 523 008c 03B0     		add	sp, sp, #12
+ 524              	.LCFI15:
+ 525              		.cfi_def_cfa_offset 28
+ 526              		@ sp needed
+ 527 008e BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 528              		.cfi_endproc
+ 529              	.LFE5:
+ 531              		.section	.text.flash_driver_sector_erase,"ax",%progbits
+ 532              		.align	1
+ 533              		.global	flash_driver_sector_erase
+ 534              		.syntax unified
+ 535              		.thumb
+ 536              		.thumb_func
+ 538              	flash_driver_sector_erase:
+ 539              	.LVL61:
+ 540              	.LFB6:
+ARM GAS  /tmp/cce4S0sR.s 			page 14
+
+
+ 164:External/flash_driver/Src/flash_driver.c **** 
+ 165:External/flash_driver/Src/flash_driver.c **** // The Sector Erase instruction sets all memory within a specified sector
+ 166:External/flash_driver/Src/flash_driver.c **** // (4K-bytes) to the erased state of all 1s (FFh).
+ 167:External/flash_driver/Src/flash_driver.c **** // Winbond W25Q128JV datasheet (pg. 39)
+ 168:External/flash_driver/Src/flash_driver.c **** flash_driver_status flash_driver_sector_erase(uint32_t address)
+ 169:External/flash_driver/Src/flash_driver.c **** {
+ 541              		.loc 1 169 1 is_stmt 1 view -0
+ 542              		.cfi_startproc
+ 543              		@ args = 0, pretend = 0, frame = 8
+ 544              		@ frame_needed = 0, uses_anonymous_args = 0
+ 545              		.loc 1 169 1 is_stmt 0 view .LVU135
+ 546 0000 30B5     		push	{r4, r5, lr}
+ 547              	.LCFI16:
+ 548              		.cfi_def_cfa_offset 12
+ 549              		.cfi_offset 4, -12
+ 550              		.cfi_offset 5, -8
+ 551              		.cfi_offset 14, -4
+ 552 0002 83B0     		sub	sp, sp, #12
+ 553              	.LCFI17:
+ 554              		.cfi_def_cfa_offset 24
+ 555 0004 0546     		mov	r5, r0
+ 170:External/flash_driver/Src/flash_driver.c ****   flash_driver_status status = flash_driver_is_busy();
+ 556              		.loc 1 170 3 is_stmt 1 view .LVU136
+ 557              		.loc 1 170 32 is_stmt 0 view .LVU137
+ 558 0006 FFF7FEFF 		bl	flash_driver_is_busy
+ 559              	.LVL62:
+ 560              		.loc 1 170 32 view .LVU138
+ 561 000a 0446     		mov	r4, r0
+ 562              	.LVL63:
+ 171:External/flash_driver/Src/flash_driver.c ****   status |= flash_driver_write_enable();
+ 563              		.loc 1 171 3 is_stmt 1 view .LVU139
+ 564              		.loc 1 171 13 is_stmt 0 view .LVU140
+ 565 000c FFF7FEFF 		bl	flash_driver_write_enable
+ 566              	.LVL64:
+ 567              		.loc 1 171 10 discriminator 1 view .LVU141
+ 568 0010 44EA0003 		orr	r3, r4, r0
+ 569              	.LVL65:
+ 172:External/flash_driver/Src/flash_driver.c ****   if (status)
+ 570              		.loc 1 172 3 is_stmt 1 view .LVU142
+ 571              		.loc 1 172 6 is_stmt 0 view .LVU143
+ 572 0014 13F0FF04 		ands	r4, r3, #255
+ 573 0018 02D0     		beq	.L24
+ 574              	.LVL66:
+ 575              	.L22:
+ 173:External/flash_driver/Src/flash_driver.c ****     return status;
+ 174:External/flash_driver/Src/flash_driver.c **** 
+ 175:External/flash_driver/Src/flash_driver.c ****   uint8_t output_data[4] = { FLASH_DRIVER_ERASE_SECTOR_CMD };
+ 176:External/flash_driver/Src/flash_driver.c ****   uint32_t reversed_addr = flash_driver_reverse_addr(address);
+ 177:External/flash_driver/Src/flash_driver.c ****   memcpy(output_data + 1, (uint8_t*)&reversed_addr, 3);
+ 178:External/flash_driver/Src/flash_driver.c **** 
+ 179:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(true);
+ 180:External/flash_driver/Src/flash_driver.c ****   status = flash_driver_io_write(
+ 181:External/flash_driver/Src/flash_driver.c ****     output_data, sizeof(output_data)
+ 182:External/flash_driver/Src/flash_driver.c ****   );
+ 183:External/flash_driver/Src/flash_driver.c ****   flash_driver_select(false);
+ 184:External/flash_driver/Src/flash_driver.c **** 
+ 185:External/flash_driver/Src/flash_driver.c ****   return status;
+ARM GAS  /tmp/cce4S0sR.s 			page 15
+
+
+ 186:External/flash_driver/Src/flash_driver.c **** }
+ 576              		.loc 1 186 1 view .LVU144
+ 577 001a 2046     		mov	r0, r4
+ 578 001c 03B0     		add	sp, sp, #12
+ 579              	.LCFI18:
+ 580              		.cfi_remember_state
+ 581              		.cfi_def_cfa_offset 12
+ 582              		@ sp needed
+ 583 001e 30BD     		pop	{r4, r5, pc}
+ 584              	.LVL67:
+ 585              	.L24:
+ 586              	.LCFI19:
+ 587              		.cfi_restore_state
+ 175:External/flash_driver/Src/flash_driver.c ****   uint32_t reversed_addr = flash_driver_reverse_addr(address);
+ 588              		.loc 1 175 3 is_stmt 1 view .LVU145
+ 175:External/flash_driver/Src/flash_driver.c ****   uint32_t reversed_addr = flash_driver_reverse_addr(address);
+ 589              		.loc 1 175 11 is_stmt 0 view .LVU146
+ 590 0020 2023     		movs	r3, #32
+ 591              	.LVL68:
+ 175:External/flash_driver/Src/flash_driver.c ****   uint32_t reversed_addr = flash_driver_reverse_addr(address);
+ 592              		.loc 1 175 11 view .LVU147
+ 593 0022 0193     		str	r3, [sp, #4]
+ 176:External/flash_driver/Src/flash_driver.c ****   memcpy(output_data + 1, (uint8_t*)&reversed_addr, 3);
+ 594              		.loc 1 176 3 is_stmt 1 view .LVU148
+ 595              	.LVL69:
+ 596              	.LBB12:
+ 597              	.LBI12:
+  13:External/flash_driver/Src/flash_driver.c **** {
+ 598              		.loc 1 13 24 view .LVU149
+ 599              	.LBB13:
+  15:External/flash_driver/Src/flash_driver.c ****   result |= address & 0xff00;
+ 600              		.loc 1 15 3 view .LVU150
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 601              		.loc 1 16 3 view .LVU151
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 602              		.loc 1 16 21 is_stmt 0 view .LVU152
+ 603 0024 05F47F43 		and	r3, r5, #65280
+  16:External/flash_driver/Src/flash_driver.c ****   result |= (address & 0xff0000) >> 16;
+ 604              		.loc 1 16 10 view .LVU153
+ 605 0028 43EA0543 		orr	r3, r3, r5, lsl #16
+ 606              	.LVL70:
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 607              		.loc 1 17 3 is_stmt 1 view .LVU154
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 608              		.loc 1 17 34 is_stmt 0 view .LVU155
+ 609 002c C5F30745 		ubfx	r5, r5, #16, #8
+ 610              	.LVL71:
+  17:External/flash_driver/Src/flash_driver.c **** 
+ 611              		.loc 1 17 10 view .LVU156
+ 612 0030 2B43     		orrs	r3, r3, r5
+ 613              	.LVL72:
+  19:External/flash_driver/Src/flash_driver.c **** }
+ 614              		.loc 1 19 3 is_stmt 1 view .LVU157
+  19:External/flash_driver/Src/flash_driver.c **** }
+ 615              		.loc 1 19 3 is_stmt 0 view .LVU158
+ 616              	.LBE13:
+ 617              	.LBE12:
+ARM GAS  /tmp/cce4S0sR.s 			page 16
+
+
+ 176:External/flash_driver/Src/flash_driver.c ****   memcpy(output_data + 1, (uint8_t*)&reversed_addr, 3);
+ 618              		.loc 1 176 12 discriminator 1 view .LVU159
+ 619 0032 0093     		str	r3, [sp]
+ 177:External/flash_driver/Src/flash_driver.c **** 
+ 620              		.loc 1 177 3 is_stmt 1 view .LVU160
+ 621 0034 BDF80020 		ldrh	r2, [sp]	@ unaligned
+ 622 0038 9DF80230 		ldrb	r3, [sp, #2]	@ zero_extendqisi2
+ 623 003c ADF80520 		strh	r2, [sp, #5]	@ unaligned
+ 624 0040 8DF80730 		strb	r3, [sp, #7]
+ 179:External/flash_driver/Src/flash_driver.c ****   status = flash_driver_io_write(
+ 625              		.loc 1 179 3 view .LVU161
+ 626 0044 0120     		movs	r0, #1
+ 627 0046 FFF7FEFF 		bl	flash_driver_select
+ 628              	.LVL73:
+ 180:External/flash_driver/Src/flash_driver.c ****     output_data, sizeof(output_data)
+ 629              		.loc 1 180 3 view .LVU162
+ 180:External/flash_driver/Src/flash_driver.c ****     output_data, sizeof(output_data)
+ 630              		.loc 1 180 12 is_stmt 0 view .LVU163
+ 631 004a 0421     		movs	r1, #4
+ 632 004c 0DEB0100 		add	r0, sp, r1
+ 633 0050 FFF7FEFF 		bl	flash_driver_io_write
+ 634              	.LVL74:
+ 635 0054 0446     		mov	r4, r0
+ 636              	.LVL75:
+ 183:External/flash_driver/Src/flash_driver.c **** 
+ 637              		.loc 1 183 3 is_stmt 1 view .LVU164
+ 638 0056 0020     		movs	r0, #0
+ 639 0058 FFF7FEFF 		bl	flash_driver_select
+ 640              	.LVL76:
+ 185:External/flash_driver/Src/flash_driver.c **** }
+ 641              		.loc 1 185 3 view .LVU165
+ 185:External/flash_driver/Src/flash_driver.c **** }
+ 642              		.loc 1 185 10 is_stmt 0 view .LVU166
+ 643 005c DDE7     		b	.L22
+ 644              		.cfi_endproc
+ 645              	.LFE6:
+ 647              		.text
+ 648              	.Letext0:
+ 649              		.file 2 "External/flash_driver/Inc/flash_driver_defs.h"
+ 650              		.file 3 "/usr/local/src/arm-gnu-toolchain-13.2/arm-none-eabi/include/machine/_default_types.h"
+ 651              		.file 4 "/usr/local/src/arm-gnu-toolchain-13.2/arm-none-eabi/include/sys/_stdint.h"
+ 652              		.file 5 "/usr/local/src/arm-gnu-toolchain-13.2/lib/gcc/arm-none-eabi/13.2.1/include/stddef.h"
+ 653              		.file 6 "External/flash_driver/Inc/flash_driver_io.h"
+ 654              		.file 7 "/usr/local/src/arm-gnu-toolchain-13.2/arm-none-eabi/include/string.h"
+ 655              		.file 8 "/usr/local/src/arm-gnu-toolchain-13.2/arm-none-eabi/include/stdlib.h"
+ 656              		.file 9 "<built-in>"
+ARM GAS  /tmp/cce4S0sR.s 			page 17
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 flash_driver.c
+     /tmp/cce4S0sR.s:19     .text.flash_driver_is_busy:00000000 $t
+     /tmp/cce4S0sR.s:24     .text.flash_driver_is_busy:00000000 flash_driver_is_busy
+     /tmp/cce4S0sR.s:82     .text.flash_driver_write_enable:00000000 $t
+     /tmp/cce4S0sR.s:87     .text.flash_driver_write_enable:00000000 flash_driver_write_enable
+     /tmp/cce4S0sR.s:134    .text.flash_driver_check_link:00000000 $t
+     /tmp/cce4S0sR.s:140    .text.flash_driver_check_link:00000000 flash_driver_check_link
+     /tmp/cce4S0sR.s:233    .text.flash_driver_write:00000000 $t
+     /tmp/cce4S0sR.s:239    .text.flash_driver_write:00000000 flash_driver_write
+     /tmp/cce4S0sR.s:376    .text.flash_driver_read:00000000 $t
+     /tmp/cce4S0sR.s:382    .text.flash_driver_read:00000000 flash_driver_read
+     /tmp/cce4S0sR.s:532    .text.flash_driver_sector_erase:00000000 $t
+     /tmp/cce4S0sR.s:538    .text.flash_driver_sector_erase:00000000 flash_driver_sector_erase
+
+UNDEFINED SYMBOLS
+flash_driver_select
+flash_driver_io_write_read
+flash_driver_io_write
+malloc
+memcpy
+free
