@@ -5,7 +5,7 @@ CFLAGS = -DTEST -DUNITY_INCLUDE_CONFIG_H
 TESTS_DIR = Tests
 UNITY_DIR = External/Unity-2.5.2
 FLASH_DRIVER = External/flash_driver
-FOR_TARGET = N
+FOR_TARGET = Y
 
 C_INCLUDES += \
 -I$(FLASH_DRIVER)/Inc \
