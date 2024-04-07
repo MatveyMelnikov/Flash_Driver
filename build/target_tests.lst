@@ -1,0 +1,1115 @@
+ARM GAS  /tmp/ccXS91M5.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"target_tests.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Tests/target_tests.c"
+  18              		.section	.text.run_all_tests,"ax",%progbits
+  19              		.align	1
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	run_all_tests:
+  25              	.LFB70:
+   1:Tests/target_tests.c **** #include "main.h"
+   2:Tests/target_tests.c **** #include "string.h"
+   3:Tests/target_tests.c **** #include <stddef.h>
+   4:Tests/target_tests.c **** #include "unity_config.h"
+   5:Tests/target_tests.c **** #include "unity_fixture.h"
+   6:Tests/target_tests.c **** #include "flash_driver.h"
+   7:Tests/target_tests.c **** 
+   8:Tests/target_tests.c **** SPI_HandleTypeDef hspi1;
+   9:Tests/target_tests.c **** UART_HandleTypeDef huart1;
+  10:Tests/target_tests.c **** SPI_HandleTypeDef *flash_driver_spi = &hspi1;
+  11:Tests/target_tests.c **** 
+  12:Tests/target_tests.c **** void SystemClock_Config(void);
+  13:Tests/target_tests.c **** static void MX_GPIO_Init(void);
+  14:Tests/target_tests.c **** static void MX_SPI1_Init(void);
+  15:Tests/target_tests.c **** static void MX_USART1_UART_Init(void);
+  16:Tests/target_tests.c **** 
+  17:Tests/target_tests.c **** // Specific functions for tests
+  18:Tests/target_tests.c **** 
+  19:Tests/target_tests.c **** static void run_all_tests();
+  20:Tests/target_tests.c **** void unity_config_put_c(uint8_t a);
+  21:Tests/target_tests.c **** int _kill(int, int);
+  22:Tests/target_tests.c **** int _getpid();
+  23:Tests/target_tests.c **** void _exit(int);
+  24:Tests/target_tests.c **** 
+  25:Tests/target_tests.c **** int main(void)
+  26:Tests/target_tests.c **** {
+  27:Tests/target_tests.c ****   HAL_Init();
+  28:Tests/target_tests.c **** 
+  29:Tests/target_tests.c ****   SystemClock_Config();
+  30:Tests/target_tests.c **** 
+  31:Tests/target_tests.c ****   MX_GPIO_Init();
+  32:Tests/target_tests.c ****   MX_SPI1_Init();
+  33:Tests/target_tests.c ****   MX_USART1_UART_Init();
+ARM GAS  /tmp/ccXS91M5.s 			page 2
+
+
+  34:Tests/target_tests.c **** 
+  35:Tests/target_tests.c ****   return UnityMain(0, NULL, run_all_tests);
+  36:Tests/target_tests.c **** }
+  37:Tests/target_tests.c **** 
+  38:Tests/target_tests.c **** void SystemClock_Config(void)
+  39:Tests/target_tests.c **** {
+  40:Tests/target_tests.c ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  41:Tests/target_tests.c ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  42:Tests/target_tests.c **** 
+  43:Tests/target_tests.c ****   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  44:Tests/target_tests.c ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  45:Tests/target_tests.c ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  46:Tests/target_tests.c ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  47:Tests/target_tests.c ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  48:Tests/target_tests.c ****   {
+  49:Tests/target_tests.c ****     Error_Handler();
+  50:Tests/target_tests.c ****   }
+  51:Tests/target_tests.c **** 
+  52:Tests/target_tests.c ****   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+  53:Tests/target_tests.c ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  54:Tests/target_tests.c ****   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  55:Tests/target_tests.c ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  56:Tests/target_tests.c ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  57:Tests/target_tests.c ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  58:Tests/target_tests.c **** 
+  59:Tests/target_tests.c ****   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  60:Tests/target_tests.c ****   {
+  61:Tests/target_tests.c ****     Error_Handler();
+  62:Tests/target_tests.c ****   }
+  63:Tests/target_tests.c **** }
+  64:Tests/target_tests.c **** 
+  65:Tests/target_tests.c **** static void MX_SPI1_Init(void)
+  66:Tests/target_tests.c **** {
+  67:Tests/target_tests.c ****   hspi1.Instance = SPI1;
+  68:Tests/target_tests.c ****   hspi1.Init.Mode = SPI_MODE_MASTER;
+  69:Tests/target_tests.c ****   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  70:Tests/target_tests.c ****   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  71:Tests/target_tests.c ****   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  72:Tests/target_tests.c ****   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  73:Tests/target_tests.c ****   hspi1.Init.NSS = SPI_NSS_SOFT;
+  74:Tests/target_tests.c ****   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  75:Tests/target_tests.c ****   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  76:Tests/target_tests.c ****   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  77:Tests/target_tests.c ****   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  78:Tests/target_tests.c ****   hspi1.Init.CRCPolynomial = 10;
+  79:Tests/target_tests.c ****   if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  80:Tests/target_tests.c ****   {
+  81:Tests/target_tests.c ****     Error_Handler();
+  82:Tests/target_tests.c ****   }
+  83:Tests/target_tests.c **** }
+  84:Tests/target_tests.c **** 
+  85:Tests/target_tests.c **** static void MX_USART1_UART_Init(void)
+  86:Tests/target_tests.c **** {
+  87:Tests/target_tests.c ****   huart1.Instance = USART1;
+  88:Tests/target_tests.c ****   huart1.Init.BaudRate = 115200;
+  89:Tests/target_tests.c ****   huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  90:Tests/target_tests.c ****   huart1.Init.StopBits = UART_STOPBITS_1;
+ARM GAS  /tmp/ccXS91M5.s 			page 3
+
+
+  91:Tests/target_tests.c ****   huart1.Init.Parity = UART_PARITY_NONE;
+  92:Tests/target_tests.c ****   huart1.Init.Mode = UART_MODE_TX_RX;
+  93:Tests/target_tests.c ****   huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  94:Tests/target_tests.c ****   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  95:Tests/target_tests.c **** 
+  96:Tests/target_tests.c ****   if (HAL_UART_Init(&huart1) != HAL_OK)
+  97:Tests/target_tests.c ****     Error_Handler();
+  98:Tests/target_tests.c **** }
+  99:Tests/target_tests.c **** 
+ 100:Tests/target_tests.c **** static void MX_GPIO_Init(void)
+ 101:Tests/target_tests.c **** {
+ 102:Tests/target_tests.c ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
+ 103:Tests/target_tests.c ****   __HAL_RCC_GPIOA_CLK_ENABLE();
+ 104:Tests/target_tests.c ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+ 105:Tests/target_tests.c **** 
+ 106:Tests/target_tests.c ****   HAL_GPIO_WritePin(Flash_CS_GPIO_Port, Flash_CS_Pin, GPIO_PIN_RESET);
+ 107:Tests/target_tests.c **** 
+ 108:Tests/target_tests.c ****   GPIO_InitStruct.Pin = Flash_CS_Pin;
+ 109:Tests/target_tests.c ****   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+ 110:Tests/target_tests.c ****   GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 111:Tests/target_tests.c ****   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 112:Tests/target_tests.c ****   HAL_GPIO_Init(Flash_CS_GPIO_Port, &GPIO_InitStruct);
+ 113:Tests/target_tests.c **** }
+ 114:Tests/target_tests.c **** 
+ 115:Tests/target_tests.c **** static void run_all_tests()
+ 116:Tests/target_tests.c **** {
+  26              		.loc 1 116 1 view -0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30 0000 08B5     		push	{r3, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 8
+  33              		.cfi_offset 3, -8
+  34              		.cfi_offset 14, -4
+  35              	.LBB4:
+ 117:Tests/target_tests.c **** 	RUN_TEST_GROUP(flash_driver);
+  36              		.loc 1 117 2 view .LVU1
+  37              		.loc 1 117 2 view .LVU2
+  38 0002 FFF7FEFF 		bl	TEST_flash_driver_GROUP_RUNNER
+  39              	.LVL0:
+  40              	.LBE4:
+  41              		.loc 1 117 30 discriminator 1 view .LVU3
+ 118:Tests/target_tests.c **** }
+  42              		.loc 1 118 1 is_stmt 0 view .LVU4
+  43 0006 08BD     		pop	{r3, pc}
+  44              		.cfi_endproc
+  45              	.LFE70:
+  47              		.section	.text.MX_GPIO_Init,"ax",%progbits
+  48              		.align	1
+  49              		.syntax unified
+  50              		.thumb
+  51              		.thumb_func
+  53              	MX_GPIO_Init:
+  54              	.LFB69:
+ 101:Tests/target_tests.c ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  55              		.loc 1 101 1 is_stmt 1 view -0
+ARM GAS  /tmp/ccXS91M5.s 			page 4
+
+
+  56              		.cfi_startproc
+  57              		@ args = 0, pretend = 0, frame = 24
+  58              		@ frame_needed = 0, uses_anonymous_args = 0
+  59 0000 10B5     		push	{r4, lr}
+  60              	.LCFI1:
+  61              		.cfi_def_cfa_offset 8
+  62              		.cfi_offset 4, -8
+  63              		.cfi_offset 14, -4
+  64 0002 86B0     		sub	sp, sp, #24
+  65              	.LCFI2:
+  66              		.cfi_def_cfa_offset 32
+ 102:Tests/target_tests.c ****   __HAL_RCC_GPIOA_CLK_ENABLE();
+  67              		.loc 1 102 3 view .LVU6
+ 102:Tests/target_tests.c ****   __HAL_RCC_GPIOA_CLK_ENABLE();
+  68              		.loc 1 102 20 is_stmt 0 view .LVU7
+  69 0004 0022     		movs	r2, #0
+  70 0006 0292     		str	r2, [sp, #8]
+  71 0008 0392     		str	r2, [sp, #12]
+  72 000a 0492     		str	r2, [sp, #16]
+  73 000c 0592     		str	r2, [sp, #20]
+ 103:Tests/target_tests.c ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+  74              		.loc 1 103 3 is_stmt 1 view .LVU8
+  75              	.LBB5:
+ 103:Tests/target_tests.c ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+  76              		.loc 1 103 3 view .LVU9
+ 103:Tests/target_tests.c ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+  77              		.loc 1 103 3 view .LVU10
+  78 000e 124B     		ldr	r3, .L5
+  79 0010 9969     		ldr	r1, [r3, #24]
+  80 0012 41F00401 		orr	r1, r1, #4
+  81 0016 9961     		str	r1, [r3, #24]
+ 103:Tests/target_tests.c ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+  82              		.loc 1 103 3 view .LVU11
+  83 0018 9969     		ldr	r1, [r3, #24]
+  84 001a 01F00401 		and	r1, r1, #4
+  85 001e 0091     		str	r1, [sp]
+ 103:Tests/target_tests.c ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+  86              		.loc 1 103 3 view .LVU12
+  87 0020 0099     		ldr	r1, [sp]
+  88              	.LBE5:
+ 103:Tests/target_tests.c ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+  89              		.loc 1 103 3 view .LVU13
+ 104:Tests/target_tests.c **** 
+  90              		.loc 1 104 3 view .LVU14
+  91              	.LBB6:
+ 104:Tests/target_tests.c **** 
+  92              		.loc 1 104 3 view .LVU15
+ 104:Tests/target_tests.c **** 
+  93              		.loc 1 104 3 view .LVU16
+  94 0022 9969     		ldr	r1, [r3, #24]
+  95 0024 41F00801 		orr	r1, r1, #8
+  96 0028 9961     		str	r1, [r3, #24]
+ 104:Tests/target_tests.c **** 
+  97              		.loc 1 104 3 view .LVU17
+  98 002a 9B69     		ldr	r3, [r3, #24]
+  99 002c 03F00803 		and	r3, r3, #8
+ 100 0030 0193     		str	r3, [sp, #4]
+ARM GAS  /tmp/ccXS91M5.s 			page 5
+
+
+ 104:Tests/target_tests.c **** 
+ 101              		.loc 1 104 3 view .LVU18
+ 102 0032 019B     		ldr	r3, [sp, #4]
+ 103              	.LBE6:
+ 104:Tests/target_tests.c **** 
+ 104              		.loc 1 104 3 view .LVU19
+ 106:Tests/target_tests.c **** 
+ 105              		.loc 1 106 3 view .LVU20
+ 106 0034 094C     		ldr	r4, .L5+4
+ 107 0036 0121     		movs	r1, #1
+ 108 0038 2046     		mov	r0, r4
+ 109 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 110              	.LVL1:
+ 108:Tests/target_tests.c ****   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+ 111              		.loc 1 108 3 view .LVU21
+ 108:Tests/target_tests.c ****   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+ 112              		.loc 1 108 23 is_stmt 0 view .LVU22
+ 113 003e 0123     		movs	r3, #1
+ 114 0040 0293     		str	r3, [sp, #8]
+ 109:Tests/target_tests.c ****   GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 115              		.loc 1 109 3 is_stmt 1 view .LVU23
+ 109:Tests/target_tests.c ****   GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 116              		.loc 1 109 24 is_stmt 0 view .LVU24
+ 117 0042 0393     		str	r3, [sp, #12]
+ 110:Tests/target_tests.c ****   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 118              		.loc 1 110 3 is_stmt 1 view .LVU25
+ 110:Tests/target_tests.c ****   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 119              		.loc 1 110 24 is_stmt 0 view .LVU26
+ 120 0044 0493     		str	r3, [sp, #16]
+ 111:Tests/target_tests.c ****   HAL_GPIO_Init(Flash_CS_GPIO_Port, &GPIO_InitStruct);
+ 121              		.loc 1 111 3 is_stmt 1 view .LVU27
+ 111:Tests/target_tests.c ****   HAL_GPIO_Init(Flash_CS_GPIO_Port, &GPIO_InitStruct);
+ 122              		.loc 1 111 25 is_stmt 0 view .LVU28
+ 123 0046 0223     		movs	r3, #2
+ 124 0048 0593     		str	r3, [sp, #20]
+ 112:Tests/target_tests.c **** }
+ 125              		.loc 1 112 3 is_stmt 1 view .LVU29
+ 126 004a 02A9     		add	r1, sp, #8
+ 127 004c 2046     		mov	r0, r4
+ 128 004e FFF7FEFF 		bl	HAL_GPIO_Init
+ 129              	.LVL2:
+ 113:Tests/target_tests.c **** 
+ 130              		.loc 1 113 1 is_stmt 0 view .LVU30
+ 131 0052 06B0     		add	sp, sp, #24
+ 132              	.LCFI3:
+ 133              		.cfi_def_cfa_offset 8
+ 134              		@ sp needed
+ 135 0054 10BD     		pop	{r4, pc}
+ 136              	.L6:
+ 137 0056 00BF     		.align	2
+ 138              	.L5:
+ 139 0058 00100240 		.word	1073876992
+ 140 005c 000C0140 		.word	1073810432
+ 141              		.cfi_endproc
+ 142              	.LFE69:
+ 144              		.section	.text.unity_config_put_c,"ax",%progbits
+ 145              		.align	1
+ARM GAS  /tmp/ccXS91M5.s 			page 6
+
+
+ 146              		.global	unity_config_put_c
+ 147              		.syntax unified
+ 148              		.thumb
+ 149              		.thumb_func
+ 151              	unity_config_put_c:
+ 152              	.LVL3:
+ 153              	.LFB71:
+ 119:Tests/target_tests.c **** 
+ 120:Tests/target_tests.c **** void unity_config_put_c(uint8_t a)
+ 121:Tests/target_tests.c **** {
+ 154              		.loc 1 121 1 is_stmt 1 view -0
+ 155              		.cfi_startproc
+ 156              		@ args = 0, pretend = 0, frame = 8
+ 157              		@ frame_needed = 0, uses_anonymous_args = 0
+ 158              		.loc 1 121 1 is_stmt 0 view .LVU32
+ 159 0000 00B5     		push	{lr}
+ 160              	.LCFI4:
+ 161              		.cfi_def_cfa_offset 4
+ 162              		.cfi_offset 14, -4
+ 163 0002 83B0     		sub	sp, sp, #12
+ 164              	.LCFI5:
+ 165              		.cfi_def_cfa_offset 16
+ 166 0004 8DF80700 		strb	r0, [sp, #7]
+ 122:Tests/target_tests.c ****   (void) HAL_UART_Transmit(&huart1, &a, sizeof(a), 100U);
+ 167              		.loc 1 122 3 is_stmt 1 view .LVU33
+ 168              		.loc 1 122 10 is_stmt 0 view .LVU34
+ 169 0008 6423     		movs	r3, #100
+ 170 000a 0122     		movs	r2, #1
+ 171 000c 0DF10701 		add	r1, sp, #7
+ 172 0010 0248     		ldr	r0, .L9
+ 173              	.LVL4:
+ 174              		.loc 1 122 10 view .LVU35
+ 175 0012 FFF7FEFF 		bl	HAL_UART_Transmit
+ 176              	.LVL5:
+ 123:Tests/target_tests.c **** }
+ 177              		.loc 1 123 1 view .LVU36
+ 178 0016 03B0     		add	sp, sp, #12
+ 179              	.LCFI6:
+ 180              		.cfi_def_cfa_offset 4
+ 181              		@ sp needed
+ 182 0018 5DF804FB 		ldr	pc, [sp], #4
+ 183              	.L10:
+ 184              		.align	2
+ 185              	.L9:
+ 186 001c 00000000 		.word	huart1
+ 187              		.cfi_endproc
+ 188              	.LFE71:
+ 190              		.section	.text._kill,"ax",%progbits
+ 191              		.align	1
+ 192              		.global	_kill
+ 193              		.syntax unified
+ 194              		.thumb
+ 195              		.thumb_func
+ 197              	_kill:
+ 198              	.LFB72:
+ 124:Tests/target_tests.c **** 
+ 125:Tests/target_tests.c **** int _kill(int, int)
+ARM GAS  /tmp/ccXS91M5.s 			page 7
+
+
+ 126:Tests/target_tests.c **** {
+ 199              		.loc 1 126 1 is_stmt 1 view -0
+ 200              		.cfi_startproc
+ 201              		@ args = 0, pretend = 0, frame = 0
+ 202              		@ frame_needed = 0, uses_anonymous_args = 0
+ 203              		@ link register save eliminated.
+ 127:Tests/target_tests.c ****   return(-1);
+ 204              		.loc 1 127 3 view .LVU38
+ 128:Tests/target_tests.c **** }
+ 205              		.loc 1 128 1 is_stmt 0 view .LVU39
+ 206 0000 4FF0FF30 		mov	r0, #-1
+ 207 0004 7047     		bx	lr
+ 208              		.cfi_endproc
+ 209              	.LFE72:
+ 211              		.section	.text._getpid,"ax",%progbits
+ 212              		.align	1
+ 213              		.global	_getpid
+ 214              		.syntax unified
+ 215              		.thumb
+ 216              		.thumb_func
+ 218              	_getpid:
+ 219              	.LFB73:
+ 129:Tests/target_tests.c ****  
+ 130:Tests/target_tests.c **** int _getpid()
+ 131:Tests/target_tests.c **** {
+ 220              		.loc 1 131 1 is_stmt 1 view -0
+ 221              		.cfi_startproc
+ 222              		@ args = 0, pretend = 0, frame = 0
+ 223              		@ frame_needed = 0, uses_anonymous_args = 0
+ 224              		@ link register save eliminated.
+ 132:Tests/target_tests.c ****   return(1);
+ 225              		.loc 1 132 3 view .LVU41
+ 133:Tests/target_tests.c **** }
+ 226              		.loc 1 133 1 is_stmt 0 view .LVU42
+ 227 0000 0120     		movs	r0, #1
+ 228 0002 7047     		bx	lr
+ 229              		.cfi_endproc
+ 230              	.LFE73:
+ 232              		.section	.text._exit,"ax",%progbits
+ 233              		.align	1
+ 234              		.global	_exit
+ 235              		.syntax unified
+ 236              		.thumb
+ 237              		.thumb_func
+ 239              	_exit:
+ 240              	.LFB74:
+ 134:Tests/target_tests.c ****  
+ 135:Tests/target_tests.c **** void _exit(int)
+ 136:Tests/target_tests.c **** {
+ 241              		.loc 1 136 1 is_stmt 1 view -0
+ 242              		.cfi_startproc
+ 243              		@ Volatile: function does not return.
+ 244              		@ args = 0, pretend = 0, frame = 0
+ 245              		@ frame_needed = 0, uses_anonymous_args = 0
+ 246              		@ link register save eliminated.
+ 247              	.L14:
+ 137:Tests/target_tests.c ****   while(1)
+ARM GAS  /tmp/ccXS91M5.s 			page 8
+
+
+ 248              		.loc 1 137 3 view .LVU44
+ 138:Tests/target_tests.c **** 	{			
+ 139:Tests/target_tests.c **** 	}
+ 249              		.loc 1 139 2 view .LVU45
+ 137:Tests/target_tests.c ****   while(1)
+ 250              		.loc 1 137 8 view .LVU46
+ 251 0000 FEE7     		b	.L14
+ 252              		.cfi_endproc
+ 253              	.LFE74:
+ 255              		.section	.text.Error_Handler,"ax",%progbits
+ 256              		.align	1
+ 257              		.global	Error_Handler
+ 258              		.syntax unified
+ 259              		.thumb
+ 260              		.thumb_func
+ 262              	Error_Handler:
+ 263              	.LFB75:
+ 140:Tests/target_tests.c **** }
+ 141:Tests/target_tests.c **** 
+ 142:Tests/target_tests.c **** void Error_Handler(void)
+ 143:Tests/target_tests.c **** {
+ 264              		.loc 1 143 1 view -0
+ 265              		.cfi_startproc
+ 266              		@ Volatile: function does not return.
+ 267              		@ args = 0, pretend = 0, frame = 0
+ 268              		@ frame_needed = 0, uses_anonymous_args = 0
+ 269              		@ link register save eliminated.
+ 144:Tests/target_tests.c ****   __disable_irq();
+ 270              		.loc 1 144 3 view .LVU48
+ 271              	.LBB7:
+ 272              	.LBI7:
+ 273              		.file 2 "Drivers/CMSIS/Include/cmsis_gcc.h"
+   1:Drivers/CMSIS/Include/cmsis_gcc.h **** /**************************************************************************//**
+   2:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @file     cmsis_gcc.h
+   3:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @brief    CMSIS compiler GCC header file
+   4:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @version  V5.0.4
+   5:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @date     09. April 2018
+   6:Drivers/CMSIS/Include/cmsis_gcc.h ****  ******************************************************************************/
+   7:Drivers/CMSIS/Include/cmsis_gcc.h **** /*
+   8:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Copyright (c) 2009-2018 Arm Limited. All rights reserved.
+   9:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  10:Drivers/CMSIS/Include/cmsis_gcc.h ****  * SPDX-License-Identifier: Apache-2.0
+  11:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  12:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  13:Drivers/CMSIS/Include/cmsis_gcc.h ****  * not use this file except in compliance with the License.
+  14:Drivers/CMSIS/Include/cmsis_gcc.h ****  * You may obtain a copy of the License at
+  15:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  16:Drivers/CMSIS/Include/cmsis_gcc.h ****  * www.apache.org/licenses/LICENSE-2.0
+  17:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  18:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Unless required by applicable law or agreed to in writing, software
+  19:Drivers/CMSIS/Include/cmsis_gcc.h ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  20:Drivers/CMSIS/Include/cmsis_gcc.h ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  21:Drivers/CMSIS/Include/cmsis_gcc.h ****  * See the License for the specific language governing permissions and
+  22:Drivers/CMSIS/Include/cmsis_gcc.h ****  * limitations under the License.
+  23:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+  24:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  25:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __CMSIS_GCC_H
+ARM GAS  /tmp/ccXS91M5.s 			page 9
+
+
+  26:Drivers/CMSIS/Include/cmsis_gcc.h **** #define __CMSIS_GCC_H
+  27:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  28:Drivers/CMSIS/Include/cmsis_gcc.h **** /* ignore some GCC warnings */
+  29:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic push
+  30:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wsign-conversion"
+  31:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wconversion"
+  32:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wunused-parameter"
+  33:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  34:Drivers/CMSIS/Include/cmsis_gcc.h **** /* Fallback for __has_builtin */
+  35:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __has_builtin
+  36:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __has_builtin(x) (0)
+  37:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  38:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  39:Drivers/CMSIS/Include/cmsis_gcc.h **** /* CMSIS compiler specific defines */
+  40:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __ASM
+  41:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __ASM                                  __asm
+  42:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  43:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __INLINE
+  44:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __INLINE                               inline
+  45:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  46:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __STATIC_INLINE
+  47:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __STATIC_INLINE                        static inline
+  48:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  49:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __STATIC_FORCEINLINE                 
+  50:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __STATIC_FORCEINLINE                   __attribute__((always_inline)) static inline
+  51:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif                                           
+  52:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __NO_RETURN
+  53:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __NO_RETURN                            __attribute__((__noreturn__))
+  54:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  55:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __USED
+  56:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __USED                                 __attribute__((used))
+  57:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  58:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __WEAK
+  59:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __WEAK                                 __attribute__((weak))
+  60:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  61:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED
+  62:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED                               __attribute__((packed, aligned(1)))
+  63:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  64:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED_STRUCT
+  65:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED_STRUCT                        struct __attribute__((packed, aligned(1)))
+  66:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  67:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED_UNION
+  68:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED_UNION                         union __attribute__((packed, aligned(1)))
+  69:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  70:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32        /* deprecated */
+  71:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  72:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  73:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  74:Drivers/CMSIS/Include/cmsis_gcc.h ****   struct __attribute__((packed)) T_UINT32 { uint32_t v; };
+  75:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  76:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32(x)                  (((struct T_UINT32 *)(x))->v)
+  77:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  78:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT16_WRITE
+  79:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  80:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  81:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  82:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT16_WRITE { uint16_t v; };
+ARM GAS  /tmp/ccXS91M5.s 			page 10
+
+
+  83:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  84:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT16_WRITE(addr, val)    (void)((((struct T_UINT16_WRITE *)(void *)(addr))-
+  85:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  86:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT16_READ
+  87:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  88:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  89:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  90:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT16_READ { uint16_t v; };
+  91:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  92:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT16_READ(addr)          (((const struct T_UINT16_READ *)(const void *)(add
+  93:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  94:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32_WRITE
+  95:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  96:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  97:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  98:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_WRITE { uint32_t v; };
+  99:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+ 100:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))-
+ 101:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 102:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32_READ
+ 103:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+ 104:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+ 105:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+ 106:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_READ { uint32_t v; };
+ 107:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+ 108:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_READ(addr)          (((const struct T_UINT32_READ *)(const void *)(add
+ 109:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 110:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __ALIGNED
+ 111:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __ALIGNED(x)                           __attribute__((aligned(x)))
+ 112:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 113:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __RESTRICT
+ 114:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __RESTRICT                             __restrict
+ 115:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 116:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 117:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 118:Drivers/CMSIS/Include/cmsis_gcc.h **** /* ###########################  Core Function Access  ########################### */
+ 119:Drivers/CMSIS/Include/cmsis_gcc.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+ 120:Drivers/CMSIS/Include/cmsis_gcc.h ****     \defgroup CMSIS_Core_RegAccFunctions CMSIS Core Register Access Functions
+ 121:Drivers/CMSIS/Include/cmsis_gcc.h ****   @{
+ 122:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 123:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 124:Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 125:Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Enable IRQ Interrupts
+ 126:Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Enables IRQ interrupts by clearing the I-bit in the CPSR.
+ 127:Drivers/CMSIS/Include/cmsis_gcc.h ****            Can only be executed in Privileged modes.
+ 128:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 129:Drivers/CMSIS/Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __enable_irq(void)
+ 130:Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 131:Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("cpsie i" : : : "memory");
+ 132:Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 133:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 134:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 135:Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 136:Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Disable IRQ Interrupts
+ 137:Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Disables IRQ interrupts by setting the I-bit in the CPSR.
+ 138:Drivers/CMSIS/Include/cmsis_gcc.h ****            Can only be executed in Privileged modes.
+ 139:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ARM GAS  /tmp/ccXS91M5.s 			page 11
+
+
+ 140:Drivers/CMSIS/Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __disable_irq(void)
+ 274              		.loc 2 140 27 view .LVU49
+ 275              	.LBB8:
+ 141:Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 142:Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("cpsid i" : : : "memory");
+ 276              		.loc 2 142 3 view .LVU50
+ 277              		.syntax unified
+ 278              	@ 142 "Drivers/CMSIS/Include/cmsis_gcc.h" 1
+ 279 0000 72B6     		cpsid i
+ 280              	@ 0 "" 2
+ 281              		.thumb
+ 282              		.syntax unified
+ 283              	.L16:
+ 284              	.LBE8:
+ 285              	.LBE7:
+ 145:Tests/target_tests.c ****   while (1)
+ 286              		.loc 1 145 3 view .LVU51
+ 146:Tests/target_tests.c ****   {
+ 147:Tests/target_tests.c ****   }
+ 287              		.loc 1 147 3 view .LVU52
+ 145:Tests/target_tests.c ****   while (1)
+ 288              		.loc 1 145 9 view .LVU53
+ 289 0002 FEE7     		b	.L16
+ 290              		.cfi_endproc
+ 291              	.LFE75:
+ 293              		.section	.text.MX_SPI1_Init,"ax",%progbits
+ 294              		.align	1
+ 295              		.syntax unified
+ 296              		.thumb
+ 297              		.thumb_func
+ 299              	MX_SPI1_Init:
+ 300              	.LFB67:
+  66:Tests/target_tests.c ****   hspi1.Instance = SPI1;
+ 301              		.loc 1 66 1 view -0
+ 302              		.cfi_startproc
+ 303              		@ args = 0, pretend = 0, frame = 0
+ 304              		@ frame_needed = 0, uses_anonymous_args = 0
+ 305 0000 08B5     		push	{r3, lr}
+ 306              	.LCFI7:
+ 307              		.cfi_def_cfa_offset 8
+ 308              		.cfi_offset 3, -8
+ 309              		.cfi_offset 14, -4
+  67:Tests/target_tests.c ****   hspi1.Init.Mode = SPI_MODE_MASTER;
+ 310              		.loc 1 67 3 view .LVU55
+  67:Tests/target_tests.c ****   hspi1.Init.Mode = SPI_MODE_MASTER;
+ 311              		.loc 1 67 18 is_stmt 0 view .LVU56
+ 312 0002 0D48     		ldr	r0, .L21
+ 313 0004 0D4B     		ldr	r3, .L21+4
+ 314 0006 0360     		str	r3, [r0]
+  68:Tests/target_tests.c ****   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+ 315              		.loc 1 68 3 is_stmt 1 view .LVU57
+  68:Tests/target_tests.c ****   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+ 316              		.loc 1 68 19 is_stmt 0 view .LVU58
+ 317 0008 4FF48273 		mov	r3, #260
+ 318 000c 4360     		str	r3, [r0, #4]
+  69:Tests/target_tests.c ****   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+ 319              		.loc 1 69 3 is_stmt 1 view .LVU59
+ARM GAS  /tmp/ccXS91M5.s 			page 12
+
+
+  69:Tests/target_tests.c ****   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+ 320              		.loc 1 69 24 is_stmt 0 view .LVU60
+ 321 000e 0023     		movs	r3, #0
+ 322 0010 8360     		str	r3, [r0, #8]
+  70:Tests/target_tests.c ****   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+ 323              		.loc 1 70 3 is_stmt 1 view .LVU61
+  70:Tests/target_tests.c ****   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+ 324              		.loc 1 70 23 is_stmt 0 view .LVU62
+ 325 0012 C360     		str	r3, [r0, #12]
+  71:Tests/target_tests.c ****   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+ 326              		.loc 1 71 3 is_stmt 1 view .LVU63
+  71:Tests/target_tests.c ****   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+ 327              		.loc 1 71 26 is_stmt 0 view .LVU64
+ 328 0014 0361     		str	r3, [r0, #16]
+  72:Tests/target_tests.c ****   hspi1.Init.NSS = SPI_NSS_SOFT;
+ 329              		.loc 1 72 3 is_stmt 1 view .LVU65
+  72:Tests/target_tests.c ****   hspi1.Init.NSS = SPI_NSS_SOFT;
+ 330              		.loc 1 72 23 is_stmt 0 view .LVU66
+ 331 0016 4361     		str	r3, [r0, #20]
+  73:Tests/target_tests.c ****   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+ 332              		.loc 1 73 3 is_stmt 1 view .LVU67
+  73:Tests/target_tests.c ****   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+ 333              		.loc 1 73 18 is_stmt 0 view .LVU68
+ 334 0018 4FF40072 		mov	r2, #512
+ 335 001c 8261     		str	r2, [r0, #24]
+  74:Tests/target_tests.c ****   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+ 336              		.loc 1 74 3 is_stmt 1 view .LVU69
+  74:Tests/target_tests.c ****   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+ 337              		.loc 1 74 32 is_stmt 0 view .LVU70
+ 338 001e C361     		str	r3, [r0, #28]
+  75:Tests/target_tests.c ****   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+ 339              		.loc 1 75 3 is_stmt 1 view .LVU71
+  75:Tests/target_tests.c ****   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+ 340              		.loc 1 75 23 is_stmt 0 view .LVU72
+ 341 0020 0362     		str	r3, [r0, #32]
+  76:Tests/target_tests.c ****   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+ 342              		.loc 1 76 3 is_stmt 1 view .LVU73
+  76:Tests/target_tests.c ****   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+ 343              		.loc 1 76 21 is_stmt 0 view .LVU74
+ 344 0022 4362     		str	r3, [r0, #36]
+  77:Tests/target_tests.c ****   hspi1.Init.CRCPolynomial = 10;
+ 345              		.loc 1 77 3 is_stmt 1 view .LVU75
+  77:Tests/target_tests.c ****   hspi1.Init.CRCPolynomial = 10;
+ 346              		.loc 1 77 29 is_stmt 0 view .LVU76
+ 347 0024 8362     		str	r3, [r0, #40]
+  78:Tests/target_tests.c ****   if (HAL_SPI_Init(&hspi1) != HAL_OK)
+ 348              		.loc 1 78 3 is_stmt 1 view .LVU77
+  78:Tests/target_tests.c ****   if (HAL_SPI_Init(&hspi1) != HAL_OK)
+ 349              		.loc 1 78 28 is_stmt 0 view .LVU78
+ 350 0026 0A23     		movs	r3, #10
+ 351 0028 C362     		str	r3, [r0, #44]
+  79:Tests/target_tests.c ****   {
+ 352              		.loc 1 79 3 is_stmt 1 view .LVU79
+  79:Tests/target_tests.c ****   {
+ 353              		.loc 1 79 7 is_stmt 0 view .LVU80
+ 354 002a FFF7FEFF 		bl	HAL_SPI_Init
+ 355              	.LVL6:
+ARM GAS  /tmp/ccXS91M5.s 			page 13
+
+
+  79:Tests/target_tests.c ****   {
+ 356              		.loc 1 79 6 discriminator 1 view .LVU81
+ 357 002e 00B9     		cbnz	r0, .L20
+  83:Tests/target_tests.c **** 
+ 358              		.loc 1 83 1 view .LVU82
+ 359 0030 08BD     		pop	{r3, pc}
+ 360              	.L20:
+  81:Tests/target_tests.c ****   }
+ 361              		.loc 1 81 5 is_stmt 1 view .LVU83
+ 362 0032 FFF7FEFF 		bl	Error_Handler
+ 363              	.LVL7:
+ 364              	.L22:
+ 365 0036 00BF     		.align	2
+ 366              	.L21:
+ 367 0038 00000000 		.word	hspi1
+ 368 003c 00300140 		.word	1073819648
+ 369              		.cfi_endproc
+ 370              	.LFE67:
+ 372              		.section	.text.MX_USART1_UART_Init,"ax",%progbits
+ 373              		.align	1
+ 374              		.syntax unified
+ 375              		.thumb
+ 376              		.thumb_func
+ 378              	MX_USART1_UART_Init:
+ 379              	.LFB68:
+  86:Tests/target_tests.c ****   huart1.Instance = USART1;
+ 380              		.loc 1 86 1 view -0
+ 381              		.cfi_startproc
+ 382              		@ args = 0, pretend = 0, frame = 0
+ 383              		@ frame_needed = 0, uses_anonymous_args = 0
+ 384 0000 08B5     		push	{r3, lr}
+ 385              	.LCFI8:
+ 386              		.cfi_def_cfa_offset 8
+ 387              		.cfi_offset 3, -8
+ 388              		.cfi_offset 14, -4
+  87:Tests/target_tests.c ****   huart1.Init.BaudRate = 115200;
+ 389              		.loc 1 87 3 view .LVU85
+  87:Tests/target_tests.c ****   huart1.Init.BaudRate = 115200;
+ 390              		.loc 1 87 19 is_stmt 0 view .LVU86
+ 391 0002 0A48     		ldr	r0, .L27
+ 392 0004 0A4B     		ldr	r3, .L27+4
+ 393 0006 0360     		str	r3, [r0]
+  88:Tests/target_tests.c ****   huart1.Init.WordLength = UART_WORDLENGTH_8B;
+ 394              		.loc 1 88 3 is_stmt 1 view .LVU87
+  88:Tests/target_tests.c ****   huart1.Init.WordLength = UART_WORDLENGTH_8B;
+ 395              		.loc 1 88 24 is_stmt 0 view .LVU88
+ 396 0008 4FF4E133 		mov	r3, #115200
+ 397 000c 4360     		str	r3, [r0, #4]
+  89:Tests/target_tests.c ****   huart1.Init.StopBits = UART_STOPBITS_1;
+ 398              		.loc 1 89 3 is_stmt 1 view .LVU89
+  89:Tests/target_tests.c ****   huart1.Init.StopBits = UART_STOPBITS_1;
+ 399              		.loc 1 89 26 is_stmt 0 view .LVU90
+ 400 000e 0023     		movs	r3, #0
+ 401 0010 8360     		str	r3, [r0, #8]
+  90:Tests/target_tests.c ****   huart1.Init.Parity = UART_PARITY_NONE;
+ 402              		.loc 1 90 3 is_stmt 1 view .LVU91
+  90:Tests/target_tests.c ****   huart1.Init.Parity = UART_PARITY_NONE;
+ARM GAS  /tmp/ccXS91M5.s 			page 14
+
+
+ 403              		.loc 1 90 24 is_stmt 0 view .LVU92
+ 404 0012 C360     		str	r3, [r0, #12]
+  91:Tests/target_tests.c ****   huart1.Init.Mode = UART_MODE_TX_RX;
+ 405              		.loc 1 91 3 is_stmt 1 view .LVU93
+  91:Tests/target_tests.c ****   huart1.Init.Mode = UART_MODE_TX_RX;
+ 406              		.loc 1 91 22 is_stmt 0 view .LVU94
+ 407 0014 0361     		str	r3, [r0, #16]
+  92:Tests/target_tests.c ****   huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 408              		.loc 1 92 3 is_stmt 1 view .LVU95
+  92:Tests/target_tests.c ****   huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 409              		.loc 1 92 20 is_stmt 0 view .LVU96
+ 410 0016 0C22     		movs	r2, #12
+ 411 0018 4261     		str	r2, [r0, #20]
+  93:Tests/target_tests.c ****   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+ 412              		.loc 1 93 3 is_stmt 1 view .LVU97
+  93:Tests/target_tests.c ****   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+ 413              		.loc 1 93 25 is_stmt 0 view .LVU98
+ 414 001a 8361     		str	r3, [r0, #24]
+  94:Tests/target_tests.c **** 
+ 415              		.loc 1 94 3 is_stmt 1 view .LVU99
+  94:Tests/target_tests.c **** 
+ 416              		.loc 1 94 28 is_stmt 0 view .LVU100
+ 417 001c C361     		str	r3, [r0, #28]
+  96:Tests/target_tests.c ****     Error_Handler();
+ 418              		.loc 1 96 3 is_stmt 1 view .LVU101
+  96:Tests/target_tests.c ****     Error_Handler();
+ 419              		.loc 1 96 7 is_stmt 0 view .LVU102
+ 420 001e FFF7FEFF 		bl	HAL_UART_Init
+ 421              	.LVL8:
+  96:Tests/target_tests.c ****     Error_Handler();
+ 422              		.loc 1 96 6 discriminator 1 view .LVU103
+ 423 0022 00B9     		cbnz	r0, .L26
+  98:Tests/target_tests.c **** 
+ 424              		.loc 1 98 1 view .LVU104
+ 425 0024 08BD     		pop	{r3, pc}
+ 426              	.L26:
+  97:Tests/target_tests.c **** }
+ 427              		.loc 1 97 5 is_stmt 1 view .LVU105
+ 428 0026 FFF7FEFF 		bl	Error_Handler
+ 429              	.LVL9:
+ 430              	.L28:
+ 431 002a 00BF     		.align	2
+ 432              	.L27:
+ 433 002c 00000000 		.word	huart1
+ 434 0030 00380140 		.word	1073821696
+ 435              		.cfi_endproc
+ 436              	.LFE68:
+ 438              		.section	.text.SystemClock_Config,"ax",%progbits
+ 439              		.align	1
+ 440              		.global	SystemClock_Config
+ 441              		.syntax unified
+ 442              		.thumb
+ 443              		.thumb_func
+ 445              	SystemClock_Config:
+ 446              	.LFB66:
+  39:Tests/target_tests.c ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 447              		.loc 1 39 1 view -0
+ARM GAS  /tmp/ccXS91M5.s 			page 15
+
+
+ 448              		.cfi_startproc
+ 449              		@ args = 0, pretend = 0, frame = 64
+ 450              		@ frame_needed = 0, uses_anonymous_args = 0
+ 451 0000 00B5     		push	{lr}
+ 452              	.LCFI9:
+ 453              		.cfi_def_cfa_offset 4
+ 454              		.cfi_offset 14, -4
+ 455 0002 91B0     		sub	sp, sp, #68
+ 456              	.LCFI10:
+ 457              		.cfi_def_cfa_offset 72
+  40:Tests/target_tests.c ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 458              		.loc 1 40 3 view .LVU107
+  40:Tests/target_tests.c ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 459              		.loc 1 40 22 is_stmt 0 view .LVU108
+ 460 0004 2822     		movs	r2, #40
+ 461 0006 0021     		movs	r1, #0
+ 462 0008 06A8     		add	r0, sp, #24
+ 463 000a FFF7FEFF 		bl	memset
+ 464              	.LVL10:
+  41:Tests/target_tests.c **** 
+ 465              		.loc 1 41 3 is_stmt 1 view .LVU109
+  41:Tests/target_tests.c **** 
+ 466              		.loc 1 41 22 is_stmt 0 view .LVU110
+ 467 000e 0023     		movs	r3, #0
+ 468 0010 0193     		str	r3, [sp, #4]
+ 469 0012 0293     		str	r3, [sp, #8]
+ 470 0014 0393     		str	r3, [sp, #12]
+ 471 0016 0493     		str	r3, [sp, #16]
+ 472 0018 0593     		str	r3, [sp, #20]
+  43:Tests/target_tests.c ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 473              		.loc 1 43 3 is_stmt 1 view .LVU111
+  43:Tests/target_tests.c ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 474              		.loc 1 43 36 is_stmt 0 view .LVU112
+ 475 001a 0223     		movs	r3, #2
+ 476 001c 0693     		str	r3, [sp, #24]
+  44:Tests/target_tests.c ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 477              		.loc 1 44 3 is_stmt 1 view .LVU113
+  44:Tests/target_tests.c ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 478              		.loc 1 44 30 is_stmt 0 view .LVU114
+ 479 001e 0123     		movs	r3, #1
+ 480 0020 0A93     		str	r3, [sp, #40]
+  45:Tests/target_tests.c ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+ 481              		.loc 1 45 3 is_stmt 1 view .LVU115
+  45:Tests/target_tests.c ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+ 482              		.loc 1 45 41 is_stmt 0 view .LVU116
+ 483 0022 1023     		movs	r3, #16
+ 484 0024 0B93     		str	r3, [sp, #44]
+  46:Tests/target_tests.c ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 485              		.loc 1 46 3 is_stmt 1 view .LVU117
+  47:Tests/target_tests.c ****   {
+ 486              		.loc 1 47 3 view .LVU118
+  47:Tests/target_tests.c ****   {
+ 487              		.loc 1 47 7 is_stmt 0 view .LVU119
+ 488 0026 06A8     		add	r0, sp, #24
+ 489 0028 FFF7FEFF 		bl	HAL_RCC_OscConfig
+ 490              	.LVL11:
+  47:Tests/target_tests.c ****   {
+ARM GAS  /tmp/ccXS91M5.s 			page 16
+
+
+ 491              		.loc 1 47 6 discriminator 1 view .LVU120
+ 492 002c 68B9     		cbnz	r0, .L33
+  52:Tests/target_tests.c ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 493              		.loc 1 52 3 is_stmt 1 view .LVU121
+  52:Tests/target_tests.c ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 494              		.loc 1 52 31 is_stmt 0 view .LVU122
+ 495 002e 0F23     		movs	r3, #15
+ 496 0030 0193     		str	r3, [sp, #4]
+  54:Tests/target_tests.c ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 497              		.loc 1 54 3 is_stmt 1 view .LVU123
+  54:Tests/target_tests.c ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 498              		.loc 1 54 34 is_stmt 0 view .LVU124
+ 499 0032 0021     		movs	r1, #0
+ 500 0034 0291     		str	r1, [sp, #8]
+  55:Tests/target_tests.c ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 501              		.loc 1 55 3 is_stmt 1 view .LVU125
+  55:Tests/target_tests.c ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 502              		.loc 1 55 35 is_stmt 0 view .LVU126
+ 503 0036 0391     		str	r1, [sp, #12]
+  56:Tests/target_tests.c ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 504              		.loc 1 56 3 is_stmt 1 view .LVU127
+  56:Tests/target_tests.c ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 505              		.loc 1 56 36 is_stmt 0 view .LVU128
+ 506 0038 0491     		str	r1, [sp, #16]
+  57:Tests/target_tests.c **** 
+ 507              		.loc 1 57 3 is_stmt 1 view .LVU129
+  57:Tests/target_tests.c **** 
+ 508              		.loc 1 57 36 is_stmt 0 view .LVU130
+ 509 003a 0591     		str	r1, [sp, #20]
+  59:Tests/target_tests.c ****   {
+ 510              		.loc 1 59 3 is_stmt 1 view .LVU131
+  59:Tests/target_tests.c ****   {
+ 511              		.loc 1 59 7 is_stmt 0 view .LVU132
+ 512 003c 01A8     		add	r0, sp, #4
+ 513 003e FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 514              	.LVL12:
+  59:Tests/target_tests.c ****   {
+ 515              		.loc 1 59 6 discriminator 1 view .LVU133
+ 516 0042 20B9     		cbnz	r0, .L34
+  63:Tests/target_tests.c **** 
+ 517              		.loc 1 63 1 view .LVU134
+ 518 0044 11B0     		add	sp, sp, #68
+ 519              	.LCFI11:
+ 520              		.cfi_remember_state
+ 521              		.cfi_def_cfa_offset 4
+ 522              		@ sp needed
+ 523 0046 5DF804FB 		ldr	pc, [sp], #4
+ 524              	.L33:
+ 525              	.LCFI12:
+ 526              		.cfi_restore_state
+  49:Tests/target_tests.c ****   }
+ 527              		.loc 1 49 5 is_stmt 1 view .LVU135
+ 528 004a FFF7FEFF 		bl	Error_Handler
+ 529              	.LVL13:
+ 530              	.L34:
+  61:Tests/target_tests.c ****   }
+ 531              		.loc 1 61 5 view .LVU136
+ARM GAS  /tmp/ccXS91M5.s 			page 17
+
+
+ 532 004e FFF7FEFF 		bl	Error_Handler
+ 533              	.LVL14:
+ 534              		.cfi_endproc
+ 535              	.LFE66:
+ 537              		.section	.text.main,"ax",%progbits
+ 538              		.align	1
+ 539              		.global	main
+ 540              		.syntax unified
+ 541              		.thumb
+ 542              		.thumb_func
+ 544              	main:
+ 545              	.LFB65:
+  26:Tests/target_tests.c ****   HAL_Init();
+ 546              		.loc 1 26 1 view -0
+ 547              		.cfi_startproc
+ 548              		@ args = 0, pretend = 0, frame = 0
+ 549              		@ frame_needed = 0, uses_anonymous_args = 0
+ 550 0000 08B5     		push	{r3, lr}
+ 551              	.LCFI13:
+ 552              		.cfi_def_cfa_offset 8
+ 553              		.cfi_offset 3, -8
+ 554              		.cfi_offset 14, -4
+  27:Tests/target_tests.c **** 
+ 555              		.loc 1 27 3 view .LVU138
+ 556 0002 FFF7FEFF 		bl	HAL_Init
+ 557              	.LVL15:
+  29:Tests/target_tests.c **** 
+ 558              		.loc 1 29 3 view .LVU139
+ 559 0006 FFF7FEFF 		bl	SystemClock_Config
+ 560              	.LVL16:
+  31:Tests/target_tests.c ****   MX_SPI1_Init();
+ 561              		.loc 1 31 3 view .LVU140
+ 562 000a FFF7FEFF 		bl	MX_GPIO_Init
+ 563              	.LVL17:
+  32:Tests/target_tests.c ****   MX_USART1_UART_Init();
+ 564              		.loc 1 32 3 view .LVU141
+ 565 000e FFF7FEFF 		bl	MX_SPI1_Init
+ 566              	.LVL18:
+  33:Tests/target_tests.c **** 
+ 567              		.loc 1 33 3 view .LVU142
+ 568 0012 FFF7FEFF 		bl	MX_USART1_UART_Init
+ 569              	.LVL19:
+  35:Tests/target_tests.c **** }
+ 570              		.loc 1 35 3 view .LVU143
+  35:Tests/target_tests.c **** }
+ 571              		.loc 1 35 10 is_stmt 0 view .LVU144
+ 572 0016 034A     		ldr	r2, .L37
+ 573 0018 0021     		movs	r1, #0
+ 574 001a 0846     		mov	r0, r1
+ 575 001c FFF7FEFF 		bl	UnityMain
+ 576              	.LVL20:
+  36:Tests/target_tests.c **** 
+ 577              		.loc 1 36 1 view .LVU145
+ 578 0020 08BD     		pop	{r3, pc}
+ 579              	.L38:
+ 580 0022 00BF     		.align	2
+ 581              	.L37:
+ARM GAS  /tmp/ccXS91M5.s 			page 18
+
+
+ 582 0024 00000000 		.word	run_all_tests
+ 583              		.cfi_endproc
+ 584              	.LFE65:
+ 586              		.global	flash_driver_spi
+ 587              		.section	.data.flash_driver_spi,"aw"
+ 588              		.align	2
+ 591              	flash_driver_spi:
+ 592 0000 00000000 		.word	hspi1
+ 593              		.global	huart1
+ 594              		.section	.bss.huart1,"aw",%nobits
+ 595              		.align	2
+ 598              	huart1:
+ 599 0000 00000000 		.space	72
+ 599      00000000 
+ 599      00000000 
+ 599      00000000 
+ 599      00000000 
+ 600              		.global	hspi1
+ 601              		.section	.bss.hspi1,"aw",%nobits
+ 602              		.align	2
+ 605              	hspi1:
+ 606 0000 00000000 		.space	88
+ 606      00000000 
+ 606      00000000 
+ 606      00000000 
+ 606      00000000 
+ 607              		.text
+ 608              	.Letext0:
+ 609              		.file 3 "/usr/local/src/arm-gnu-toolchain-13.2/arm-none-eabi/include/machine/_default_types.h"
+ 610              		.file 4 "/usr/local/src/arm-gnu-toolchain-13.2/arm-none-eabi/include/sys/_stdint.h"
+ 611              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 612              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 613              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h"
+ 614              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h"
+ 615              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 616              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 617              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h"
+ 618              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 619              		.file 13 "External/Unity-2.5.2/extras/fixture/src/unity_fixture.h"
+ 620              		.file 14 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 621              		.file 15 "<built-in>"
+ARM GAS  /tmp/ccXS91M5.s 			page 19
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 target_tests.c
+     /tmp/ccXS91M5.s:19     .text.run_all_tests:00000000 $t
+     /tmp/ccXS91M5.s:24     .text.run_all_tests:00000000 run_all_tests
+     /tmp/ccXS91M5.s:48     .text.MX_GPIO_Init:00000000 $t
+     /tmp/ccXS91M5.s:53     .text.MX_GPIO_Init:00000000 MX_GPIO_Init
+     /tmp/ccXS91M5.s:139    .text.MX_GPIO_Init:00000058 $d
+     /tmp/ccXS91M5.s:145    .text.unity_config_put_c:00000000 $t
+     /tmp/ccXS91M5.s:151    .text.unity_config_put_c:00000000 unity_config_put_c
+     /tmp/ccXS91M5.s:186    .text.unity_config_put_c:0000001c $d
+     /tmp/ccXS91M5.s:598    .bss.huart1:00000000 huart1
+     /tmp/ccXS91M5.s:191    .text._kill:00000000 $t
+     /tmp/ccXS91M5.s:197    .text._kill:00000000 _kill
+     /tmp/ccXS91M5.s:212    .text._getpid:00000000 $t
+     /tmp/ccXS91M5.s:218    .text._getpid:00000000 _getpid
+     /tmp/ccXS91M5.s:233    .text._exit:00000000 $t
+     /tmp/ccXS91M5.s:239    .text._exit:00000000 _exit
+     /tmp/ccXS91M5.s:256    .text.Error_Handler:00000000 $t
+     /tmp/ccXS91M5.s:262    .text.Error_Handler:00000000 Error_Handler
+     /tmp/ccXS91M5.s:294    .text.MX_SPI1_Init:00000000 $t
+     /tmp/ccXS91M5.s:299    .text.MX_SPI1_Init:00000000 MX_SPI1_Init
+     /tmp/ccXS91M5.s:367    .text.MX_SPI1_Init:00000038 $d
+     /tmp/ccXS91M5.s:605    .bss.hspi1:00000000 hspi1
+     /tmp/ccXS91M5.s:373    .text.MX_USART1_UART_Init:00000000 $t
+     /tmp/ccXS91M5.s:378    .text.MX_USART1_UART_Init:00000000 MX_USART1_UART_Init
+     /tmp/ccXS91M5.s:433    .text.MX_USART1_UART_Init:0000002c $d
+     /tmp/ccXS91M5.s:439    .text.SystemClock_Config:00000000 $t
+     /tmp/ccXS91M5.s:445    .text.SystemClock_Config:00000000 SystemClock_Config
+     /tmp/ccXS91M5.s:538    .text.main:00000000 $t
+     /tmp/ccXS91M5.s:544    .text.main:00000000 main
+     /tmp/ccXS91M5.s:582    .text.main:00000024 $d
+     /tmp/ccXS91M5.s:591    .data.flash_driver_spi:00000000 flash_driver_spi
+     /tmp/ccXS91M5.s:588    .data.flash_driver_spi:00000000 $d
+     /tmp/ccXS91M5.s:595    .bss.huart1:00000000 $d
+     /tmp/ccXS91M5.s:602    .bss.hspi1:00000000 $d
+
+UNDEFINED SYMBOLS
+TEST_flash_driver_GROUP_RUNNER
+HAL_GPIO_WritePin
+HAL_GPIO_Init
+HAL_UART_Transmit
+HAL_SPI_Init
+HAL_UART_Init
+memset
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_Init
+UnityMain

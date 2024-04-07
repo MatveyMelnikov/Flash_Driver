@@ -3,19 +3,20 @@
 #include <stddef.h>
 #include "unity_config.h"
 #include "unity_fixture.h"
+#include "flash_driver.h"
 
-I2C_HandleTypeDef hi2c2;
+SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart1;
-I2C_HandleTypeDef *eeprom_i2c = &hi2c2; // For eeprom_io
+SPI_HandleTypeDef *flash_driver_spi = &hspi1;
 
 void SystemClock_Config(void);
-static void MX_I2C2_Init(void);
 static void MX_GPIO_Init(void);
+static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
-static void run_all_tests(void);
 
 // Specific functions for tests
 
+static void run_all_tests();
 void unity_config_put_c(uint8_t a);
 int _kill(int, int);
 int _getpid();
@@ -28,7 +29,7 @@ int main(void)
   SystemClock_Config();
 
   MX_GPIO_Init();
-  MX_I2C2_Init();
+  MX_SPI1_Init();
   MX_USART1_UART_Init();
 
   return UnityMain(0, NULL, run_all_tests);
@@ -61,18 +62,21 @@ void SystemClock_Config(void)
   }
 }
 
-static void MX_I2C2_Init(void)
+static void MX_SPI1_Init(void)
 {
-  hi2c2.Instance = I2C2;
-  hi2c2.Init.ClockSpeed = 100000;
-  hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
-  hi2c2.Init.OwnAddress1 = 0;
-  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c2.Init.OwnAddress2 = 0;
-  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -88,21 +92,29 @@ static void MX_USART1_UART_Init(void)
   huart1.Init.Mode = UART_MODE_TX_RX;
   huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+
   if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
     Error_Handler();
-  }
 }
 
 static void MX_GPIO_Init(void)
 {
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  HAL_GPIO_WritePin(Flash_CS_GPIO_Port, Flash_CS_Pin, GPIO_PIN_RESET);
+
+  GPIO_InitStruct.Pin = Flash_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(Flash_CS_GPIO_Port, &GPIO_InitStruct);
 }
 
 static void run_all_tests()
 {
-	RUN_TEST_GROUP(eeprom_driver);
+	RUN_TEST_GROUP(flash_driver);
 }
 
 void unity_config_put_c(uint8_t a)

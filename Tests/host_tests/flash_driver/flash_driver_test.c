@@ -2,6 +2,7 @@
 #include "flash_driver.h"
 #include "mock_flash_driver_io.h"
 #include <string.h>
+#include <memory.h>
 
 // Defines -------------------------------------------------------------------
 
@@ -96,8 +97,8 @@ TEST(flash_driver, check_link_error)
 
 TEST(flash_driver, check_link_busy_error)
 {
-  uint8_t check_busy_output_data[] = { 0x05 };
-  uint8_t check_busy_input_data[] = { 0x01 };
+  uint8_t check_busy_output_data[] = { 0x05, 0x0 };
+  uint8_t check_busy_input_data[] = { 0x0, 0x01 };
 
   mock_flash_driver_io_expect_select(true);
   mock_flash_driver_io_expect_write_read(
@@ -110,4 +111,85 @@ TEST(flash_driver, check_link_busy_error)
 
   flash_driver_status status = flash_driver_check_link();
   TEST_ASSERT_EQUAL(FLASH_DRIVER_BUSY, status);
+}
+
+TEST(flash_driver, write_success)
+{
+  uint8_t check_busy_output_data[] = { 0x05 };
+  uint8_t check_busy_input_data[] = { 0x00 };
+  uint8_t write_enable_output_data[] = { 0x06 };
+  uint8_t data[] = { 0x55, 0xaa };
+  uint8_t write_output_data[6] = { 0x02, 0x55, 0x0, 0xaa };
+  memcpy(write_output_data + 4, data, 2);
+
+  mock_flash_driver_io_expect_select(true);
+  mock_flash_driver_io_expect_write_read(
+    check_busy_output_data,
+    check_busy_input_data,
+    sizeof(check_busy_output_data),
+    sizeof(check_busy_input_data)
+  );
+  mock_flash_driver_io_expect_select(false);
+
+  mock_flash_driver_io_expect_select(true);
+  mock_flash_driver_io_expect_write(
+    write_enable_output_data,
+    sizeof(write_enable_output_data)
+  );
+  mock_flash_driver_io_expect_select(false);
+
+  mock_flash_driver_io_expect_select(true);
+  mock_flash_driver_io_expect_write(
+    write_output_data,
+    sizeof(write_output_data)
+  );
+  mock_flash_driver_io_expect_select(false);
+
+  flash_driver_status status = flash_driver_write(
+    0x5500aa,
+    data,
+    sizeof(data)
+  );
+  TEST_ASSERT_EQUAL(FLASH_DRIVER_OK, status);
+}
+
+TEST(flash_driver, read_success)
+{
+  uint8_t check_busy_output_data[] = { 0x05 };
+  uint8_t check_busy_input_data[] = { 0x00 };
+  uint8_t data[4];
+  uint8_t read_output_data[4] = { 0x03, 0x55, 0x0, 0xaa };
+  memcpy(read_output_data + 4, data, 2);
+  uint8_t read_input_data[8] = { 0x0, 0x0, 0x0, 0x0, 0xaa, 0x55, 0xaa, 0x55 };
+
+  mock_flash_driver_io_expect_select(true);
+  mock_flash_driver_io_expect_write_read(
+    check_busy_output_data,
+    check_busy_input_data,
+    sizeof(check_busy_output_data),
+    sizeof(check_busy_input_data)
+  );
+  mock_flash_driver_io_expect_select(false);
+
+  mock_flash_driver_io_expect_select(true);
+  mock_flash_driver_io_expect_write_read(
+    read_output_data,
+    read_input_data,
+    sizeof(read_output_data),
+    sizeof(read_input_data)
+  );
+  mock_flash_driver_io_expect_select(false);
+
+  flash_driver_status status = flash_driver_read(
+    0x5500aa,
+    data,
+    sizeof(data)
+  );
+
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(
+    read_input_data + 4,
+    data,
+    sizeof(data)
+  );
+  TEST_ASSERT_EQUAL(FLASH_DRIVER_OK, status);
 }

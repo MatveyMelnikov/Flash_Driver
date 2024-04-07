@@ -5,8 +5,6 @@
 
 // Defines -------------------------------------------------------------------
 
-// 24 bits
-
 // Static functions ----------------------------------------------------------
 
 __attribute__((always_inline))
@@ -17,6 +15,16 @@ inline static uint32_t flash_driver_reverse_addr(const uint32_t address)
   result |= (address & 0xff0000) >> 16;
 
   return result;
+}
+
+__attribute__((always_inline))
+inline static uint32_t flash_driver_is_write_args_wrong(
+  const uint32_t address,
+  const uint16_t data_size
+)
+{
+  return address >= FLASH_DRIVER_SIZE || data_size > FLASH_DRIVER_PAGE_SIZE ||
+    (address + data_size) > FLASH_DRIVER_SIZE;
 }
 
 // The Write Enable instruction sets the Write Enable Latch bit
@@ -35,7 +43,9 @@ static flash_driver_status flash_driver_write_enable()
   return status;
 }
 
-static flash_driver_status flash_driver_is_busy()
+// Implementations -----------------------------------------------------------
+
+flash_driver_status flash_driver_is_busy()
 {
   uint8_t output_data[2] = {
     FLASH_DRIVER_GET_STATUS_1_CMD,
@@ -52,11 +62,9 @@ static flash_driver_status flash_driver_is_busy()
   if (status)
     return status;
   
-  return input_data[0] & FLASH_DRIVER_BUSY_BIT ?
+  return input_data[1] & FLASH_DRIVER_BUSY_BIT ?
     FLASH_DRIVER_BUSY : FLASH_DRIVER_OK;
 }
-
-// Implementations -----------------------------------------------------------
 
 // Winbond W25Q128JV datasheet (pg. 23) - Manufacturer/Device ID cmd = 90h
 flash_driver_status flash_driver_check_link()
@@ -100,7 +108,7 @@ flash_driver_status flash_driver_write(
   const uint16_t data_size
 )
 {
-  if (data_size == 0)
+  if (data_size == 0 || flash_driver_is_write_args_wrong(address, data_size))
     return FLASH_DRIVER_INVALID_ARGS;
 
   flash_driver_status status = flash_driver_is_busy();

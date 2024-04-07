@@ -9,7 +9,7 @@ extern SPI_HandleTypeDef *flash_driver_spi;
 
 flash_driver_status flash_driver_io_write(
   uint8_t *const output_data,
-  const uint8_t output_data_size
+  const uint16_t output_data_size
 )
 {
   return (flash_driver_status)HAL_SPI_Transmit(
@@ -23,7 +23,7 @@ flash_driver_status flash_driver_io_write(
 flash_driver_status flash_driver_io_write_read(
   uint8_t *const output_data,
   uint8_t *const input_data,
-  const uint8_t output_data_size
+  const uint16_t output_data_size
 )
 {
   return (flash_driver_status)HAL_SPI_TransmitReceive(

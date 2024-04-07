@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc1NaGtC.s 			page 1
+ARM GAS  /tmp/ccEUtQQj.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -38,7 +38,7 @@ ARM GAS  /tmp/cc1NaGtC.s 			page 1
    9:External/flash_driver/Src/flash_driver_io.c **** 
   10:External/flash_driver/Src/flash_driver_io.c **** flash_driver_status flash_driver_io_write(
   11:External/flash_driver/Src/flash_driver_io.c ****   uint8_t *const output_data,
-  12:External/flash_driver/Src/flash_driver_io.c ****   const uint8_t output_data_size
+  12:External/flash_driver/Src/flash_driver_io.c ****   const uint16_t output_data_size
   13:External/flash_driver/Src/flash_driver_io.c **** )
   14:External/flash_driver/Src/flash_driver_io.c **** {
   28              		.loc 1 14 1 view -0
@@ -55,18 +55,18 @@ ARM GAS  /tmp/cc1NaGtC.s 			page 1
   15:External/flash_driver/Src/flash_driver_io.c ****   return (flash_driver_status)HAL_SPI_Transmit(
   39              		.loc 1 15 3 is_stmt 1 view .LVU2
   40              		.loc 1 15 31 is_stmt 0 view .LVU3
-  41 0004 1023     		movs	r3, #16
-  42 0006 0146     		mov	r1, r0
+  41 0004 4FF48073 		mov	r3, #256
+  42 0008 0146     		mov	r1, r0
   43              	.LVL1:
-ARM GAS  /tmp/cc1NaGtC.s 			page 2
+ARM GAS  /tmp/ccEUtQQj.s 			page 2
 
 
   44              		.loc 1 15 31 view .LVU4
-  45 0008 0248     		ldr	r0, .L3
+  45 000a 0248     		ldr	r0, .L3
   46              	.LVL2:
   47              		.loc 1 15 31 view .LVU5
-  48 000a 0068     		ldr	r0, [r0]
-  49 000c FFF7FEFF 		bl	HAL_SPI_Transmit
+  48 000c 0068     		ldr	r0, [r0]
+  49 000e FFF7FEFF 		bl	HAL_SPI_Transmit
   50              	.LVL3:
   16:External/flash_driver/Src/flash_driver_io.c ****     flash_driver_spi,
   17:External/flash_driver/Src/flash_driver_io.c ****     output_data,
@@ -75,9 +75,9 @@ ARM GAS  /tmp/cc1NaGtC.s 			page 1
   20:External/flash_driver/Src/flash_driver_io.c ****   );
   21:External/flash_driver/Src/flash_driver_io.c **** }
   51              		.loc 1 21 1 view .LVU6
-  52 0010 08BD     		pop	{r3, pc}
+  52 0012 08BD     		pop	{r3, pc}
   53              	.L4:
-  54 0012 00BF     		.align	2
+  54              		.align	2
   55              	.L3:
   56 0014 00000000 		.word	flash_driver_spi
   57              		.cfi_endproc
@@ -95,7 +95,7 @@ ARM GAS  /tmp/cc1NaGtC.s 			page 1
   23:External/flash_driver/Src/flash_driver_io.c **** flash_driver_status flash_driver_io_write_read(
   24:External/flash_driver/Src/flash_driver_io.c ****   uint8_t *const output_data,
   25:External/flash_driver/Src/flash_driver_io.c ****   uint8_t *const input_data,
-  26:External/flash_driver/Src/flash_driver_io.c ****   const uint8_t output_data_size
+  26:External/flash_driver/Src/flash_driver_io.c ****   const uint16_t output_data_size
   27:External/flash_driver/Src/flash_driver_io.c **** )
   28:External/flash_driver/Src/flash_driver_io.c **** {
   70              		.loc 1 28 1 is_stmt 1 view -0
@@ -114,22 +114,22 @@ ARM GAS  /tmp/cc1NaGtC.s 			page 1
   29:External/flash_driver/Src/flash_driver_io.c ****   return (flash_driver_status)HAL_SPI_TransmitReceive(
   83              		.loc 1 29 3 is_stmt 1 view .LVU9
   84              		.loc 1 29 31 is_stmt 0 view .LVU10
-  85 0006 1022     		movs	r2, #16
+  85 0006 4FF48072 		mov	r2, #256
   86              	.LVL5:
   87              		.loc 1 29 31 view .LVU11
-  88 0008 0092     		str	r2, [sp]
-ARM GAS  /tmp/cc1NaGtC.s 			page 3
+  88 000a 0092     		str	r2, [sp]
+ARM GAS  /tmp/ccEUtQQj.s 			page 3
 
 
-  89 000a 0A46     		mov	r2, r1
-  90 000c 0146     		mov	r1, r0
+  89 000c 0A46     		mov	r2, r1
+  90 000e 0146     		mov	r1, r0
   91              	.LVL6:
   92              		.loc 1 29 31 view .LVU12
-  93 000e 0348     		ldr	r0, .L7
+  93 0010 0348     		ldr	r0, .L7
   94              	.LVL7:
   95              		.loc 1 29 31 view .LVU13
-  96 0010 0068     		ldr	r0, [r0]
-  97 0012 FFF7FEFF 		bl	HAL_SPI_TransmitReceive
+  96 0012 0068     		ldr	r0, [r0]
+  97 0014 FFF7FEFF 		bl	HAL_SPI_TransmitReceive
   98              	.LVL8:
   30:External/flash_driver/Src/flash_driver_io.c ****     flash_driver_spi,
   31:External/flash_driver/Src/flash_driver_io.c ****     output_data,
@@ -139,15 +139,15 @@ ARM GAS  /tmp/cc1NaGtC.s 			page 1
   35:External/flash_driver/Src/flash_driver_io.c ****   );
   36:External/flash_driver/Src/flash_driver_io.c **** }
   99              		.loc 1 36 1 view .LVU14
- 100 0016 03B0     		add	sp, sp, #12
+ 100 0018 03B0     		add	sp, sp, #12
  101              	.LCFI3:
  102              		.cfi_def_cfa_offset 4
  103              		@ sp needed
- 104 0018 5DF804FB 		ldr	pc, [sp], #4
+ 104 001a 5DF804FB 		ldr	pc, [sp], #4
  105              	.L8:
- 106              		.align	2
+ 106 001e 00BF     		.align	2
  107              	.L7:
- 108 001c 00000000 		.word	flash_driver_spi
+ 108 0020 00000000 		.word	flash_driver_spi
  109              		.cfi_endproc
  110              	.LFE66:
  112              		.section	.text.flash_driver_select,"ax",%progbits
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc1NaGtC.s 			page 1
  134 0006 0121     		movs	r1, #1
  135 0008 0148     		ldr	r0, .L11
  136              	.LVL10:
-ARM GAS  /tmp/cc1NaGtC.s 			page 4
+ARM GAS  /tmp/ccEUtQQj.s 			page 4
 
 
  137              		.loc 1 40 3 is_stmt 0 view .LVU18
@@ -207,20 +207,20 @@ ARM GAS  /tmp/cc1NaGtC.s 			page 1
  156              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
  157              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
  158              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h"
-ARM GAS  /tmp/cc1NaGtC.s 			page 5
+ARM GAS  /tmp/ccEUtQQj.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 flash_driver_io.c
-     /tmp/cc1NaGtC.s:19     .text.flash_driver_io_write:00000000 $t
-     /tmp/cc1NaGtC.s:25     .text.flash_driver_io_write:00000000 flash_driver_io_write
-     /tmp/cc1NaGtC.s:56     .text.flash_driver_io_write:00000014 $d
-     /tmp/cc1NaGtC.s:61     .text.flash_driver_io_write_read:00000000 $t
-     /tmp/cc1NaGtC.s:67     .text.flash_driver_io_write_read:00000000 flash_driver_io_write_read
-     /tmp/cc1NaGtC.s:108    .text.flash_driver_io_write_read:0000001c $d
-     /tmp/cc1NaGtC.s:113    .text.flash_driver_select:00000000 $t
-     /tmp/cc1NaGtC.s:119    .text.flash_driver_select:00000000 flash_driver_select
-     /tmp/cc1NaGtC.s:145    .text.flash_driver_select:00000010 $d
+     /tmp/ccEUtQQj.s:19     .text.flash_driver_io_write:00000000 $t
+     /tmp/ccEUtQQj.s:25     .text.flash_driver_io_write:00000000 flash_driver_io_write
+     /tmp/ccEUtQQj.s:56     .text.flash_driver_io_write:00000014 $d
+     /tmp/ccEUtQQj.s:61     .text.flash_driver_io_write_read:00000000 $t
+     /tmp/ccEUtQQj.s:67     .text.flash_driver_io_write_read:00000000 flash_driver_io_write_read
+     /tmp/ccEUtQQj.s:108    .text.flash_driver_io_write_read:00000020 $d
+     /tmp/ccEUtQQj.s:113    .text.flash_driver_select:00000000 $t
+     /tmp/ccEUtQQj.s:119    .text.flash_driver_select:00000000 flash_driver_select
+     /tmp/ccEUtQQj.s:145    .text.flash_driver_select:00000010 $d
 
 UNDEFINED SYMBOLS
 HAL_SPI_Transmit

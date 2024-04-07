@@ -1,7 +1,11 @@
 {
   "files.associations": {
     "flash_driver_defs.h": "c",
-    "flash_driver_io.h": "c"
+    "flash_driver_io.h": "c",
+    "unity_fixture.h": "c",
+    "main.h": "c",
+    "string.h": "c",
+    "flash_driver.h": "c"
   },
-  "cortex-debug.variableUseNaturalFormat": false
+  "cortex-debug.variableUseNaturalFormat": true
 }
