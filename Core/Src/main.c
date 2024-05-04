@@ -102,7 +102,7 @@ int main(void)
   uint8_t output_data[4] = { 0x55, 0xaa, 0x55, 0xaa };
   uint8_t input_data[64];
 
-  //status = flash_driver_sector_erase(0x0);
+  status = flash_driver_sector_erase(0x0);
   status |= flash_driver_write(0x0, output_data, sizeof(output_data));
   status |= flash_driver_write(0x4, output_data, sizeof(output_data));
   status |= flash_driver_write(0x8, output_data, sizeof(output_data));
